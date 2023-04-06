@@ -1,6 +1,8 @@
 <?php
 namespace App\Modules\Movies\Services;
 
+use App\Model\Monument;
+
 
 class MonumentService extends Services
 {
@@ -19,6 +21,9 @@ class MonumentService extends Services
         "costToConstruct" => "nullable|integer";
         "images" => "required|json";
         "audiovisualSources" => "nullable|json" ];
+
+        private $_model;
+        private $_errors;
 
         public function __construct(Monument $model) {
             parent::__construct($model);
