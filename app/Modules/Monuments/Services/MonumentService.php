@@ -22,9 +22,6 @@ class MonumentService extends Services
         "images" => "required|json";
         "audiovisualSources" => "nullable|json" ];
 
-        private $_model;
-        private $_errors;
-
         public function __construct(Monument $model) {
             parent::__construct($model);
         }
