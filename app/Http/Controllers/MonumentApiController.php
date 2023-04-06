@@ -10,12 +10,33 @@ class MonumentApiController extends Controller
 {
     private $_service;
     public function __construct(MonumentService $service){
-        $this->_service = $service
+        $this->_service = $service;
     }
 
     public function getAllMonuments(Request $request) {
         $pages = $request->get("pages", 10); 
-
-        return $this->_service->getAllMonuments($pages)
+    
+        $parameter = $this->checkForQueryParameter($request);
+    
+        return $this->_service->getAllMonuments($pages, $parameter['name'], $parameter['value']);
     }
+    
+    private function checkForQueryParameter($request) {
+        $allowedParams = ['name', 'year', 'designer', 'cost', 'language']; 
+        $queryParameters = $request->query();
+        $result = [];
+    
+        foreach ($queryParameters as $key => $value) {
+            if (in_array($key, $allowedParams)) {
+                $result['name'] = $key;
+                $result['value'] = $value;
+                return $result;
+            }
+        }
+    
+        return null; 
+    }
+    
+      
 }
+
