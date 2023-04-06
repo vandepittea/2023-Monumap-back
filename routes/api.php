@@ -18,4 +18,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/monuments', [MonumentApiController::class, 'all']);
+Route::get('/monuments', [MonumentApiController::class, 'getAllMonuments']);
