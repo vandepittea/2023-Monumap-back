@@ -23,4 +23,8 @@ class MonumentService extends Services
         public function __construct(Monument $model) {
             parent::__construct($model);
         }
+
+        public function all($pages = 10){
+            return $this->_model->paginate($pages)->withQueryString();
+        }
 }
