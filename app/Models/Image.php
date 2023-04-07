@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Image extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'url',
+        'caption',
+    ];
+
+    public function monuments()
+    {
+        return $this->belongsToMany(Monument::class);
+    }
 }
