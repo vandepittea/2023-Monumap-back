@@ -36,6 +36,17 @@ class MonumentApiController extends Controller
         return null; 
     }
 
+    public function addMonument(Request $request){
+        $data = $request->all();
+        $monument = $this->_service->addMonument($data);
+
+        if($this->_service->hasErrors()){
+            return ["errors" => $this->_service->getErrors()];
+        }
+        
+        return $monument;
+    }
+
     public function getOneMonument($id){
         return $this->_service->getOneMonument($id);
     }
