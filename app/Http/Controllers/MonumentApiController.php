@@ -55,5 +55,14 @@ class MonumentApiController extends Controller
         $data = $request->all();
         return $this->_service->updateMonument($id, $data);
     }
+
+    public function deleteMonument($id){
+        $result = $this->_service->deleteMonument($id);
+        if ($result) {
+            return response()->json(['message' => 'Monument deleted successfully']);
+        } else {
+            return response()->json(['message' => 'Monument not found'], 404);
+        }
+    }
 }
 

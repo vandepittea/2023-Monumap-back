@@ -66,5 +66,13 @@ class MonumentService extends Service
             }
             return $monument;
         }
+
+        public function deleteMonument($id) {
+            $monument = $this->_model->find($id);
+
+            if($monument){
+                $monument->delete();
+            }
+        }
         
 }
