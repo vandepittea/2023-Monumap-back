@@ -33,8 +33,11 @@ class MonumentApiController extends Controller
                 return $result;
             }
         }
-    
         return null; 
+    }
+
+    public function getOneMonument($id){
+        return $this->_service->getOneMonument($id);
     }
 
     public function updateMonument($id, Request $request){
