@@ -20,6 +20,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/monuments', [MonumentApiController::class, 'getAllMonuments']);
 
+Route::post('/monuments', [MonumentApiController::class, 'addMonument']);
+
 Route::get('/monuments/{id}', [MonumentApiController::class, 'getOneMonument']);
 
 Route::put('monuments/{id}', [MonumentController::class, 'updateMonument']);
