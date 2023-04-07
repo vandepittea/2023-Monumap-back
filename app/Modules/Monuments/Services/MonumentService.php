@@ -39,6 +39,10 @@ class MonumentService extends Service
             return $monuments;
         }
 
+        public function getOneMonument($id){
+            return ["data" => $this->_model->find($id)];
+        }
+
         public function updateMonument($id, $data){
             $this->validate($data);
             if($this->hasErrors()){
