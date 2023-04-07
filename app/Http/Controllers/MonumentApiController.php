@@ -36,6 +36,11 @@ class MonumentApiController extends Controller
     
         return null; 
     }
+
+    public function updateMonument($id, Request $request){
+        $data = $request->all();
+        return $this->_service->updateMonument($id, $data);
+    }
     
       
 }
