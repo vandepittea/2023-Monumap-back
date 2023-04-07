@@ -4,26 +4,53 @@ namespace App\Modules\Movies\Services;
 use App\Models\Monument;
 use App\Modules\Core\Services\Service;
 use App\Modules\Core\Services\ServiceLanguages;
+use Illuminate\Validation\Rule;
+
 
 
 
 class MonumentService extends Service
 {
     protected $_rules = [
+        "id" => "required",
         "name" => "required|string|max:50",
-        "description" => "required|text",
+        "description" => "required|string",
         "location" => "required|json",
-        "historicalSignificance" => "nullable|text",
-        "type" => "required|enum",
+        "historicalSignificance" => "nullable|string",
+        "type" => [
+            "required", "string",
+            Rule::in([
+                'War Memorials',
+                'Statues and Sculptures',
+                'Historical Buildings and Sites',
+                'National Monuments',
+                'Archaeological Sites',
+                'Cultural and Religious Monuments',
+                'Public Art Installations',
+                'Memorials for Historical Events',
+                'Natural Monuments,Tombs and Mausoleums'
+            ])
+        ],
         "yearOfContstruction" => "required|year",
         "monumentDesigner" => "required|string",
-        "accessibility" => "required|json",
-        "usedMaterials" => "nullable|json",
+        "accessibility" => [
+            "required",
+            "array",
+            Rule::in([
+                'wheelchair-friendly',
+                'near parking areas',
+                'low-slope ramps',
+                'power-assisted doors',
+                'elevators, accessible washrooms'
+            ])
+        ],
+        "usedMaterials" => "nullable|array",
         "dimensions" => "nullable|json",
         "weight" => "nullable|integer",
-        "costToConstruct" => "nullable|integer",
+        "costToConstruct" => "nullable|numeric",
         "images" => "required|json",
-        "audiovisualSources" => "nullable|json" ];
+        "audiovisualSources" => "nullable|json"
+    ];
 
         public function __construct(Monument $model) {
             Parent::__construct($model);

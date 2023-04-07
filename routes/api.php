@@ -25,3 +25,5 @@ Route::post('/monuments', [MonumentApiController::class, 'addMonument']);
 Route::get('/monuments/{id}', [MonumentApiController::class, 'getOneMonument']);
 
 Route::put('monuments/{id}', [MonumentController::class, 'updateMonument']);
+
+Route::delete('monuments/{id}', [MonumentController::class], 'deleteMonument');
