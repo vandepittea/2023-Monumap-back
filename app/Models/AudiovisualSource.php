@@ -17,6 +17,6 @@ class AudiovisualSource extends Model
 
     public function monuments()
     {
-        return $this->belongsToMany(Monument::class);
+        return $this->belongsTo(Monument::class);
     }
 }

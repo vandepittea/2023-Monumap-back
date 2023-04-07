@@ -14,8 +14,8 @@ class Image extends Model
         'caption',
     ];
 
-    public function monuments()
+    public function monument()
     {
-        return $this->belongsToMany(Monument::class);
+        return $this->belongsTo(Monument::class);
     }
 }

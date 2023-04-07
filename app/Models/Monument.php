@@ -39,11 +39,11 @@ class Monument extends Model
 
     public function images()
     {
-        return $this->belongsToMany(Image::class);
+        return $this->hasMany(MonumentImage::class);
     }
 
     public function audiovisualSources()
     {
-        return $this->belongsToMany(AudiovisualSource::class);
+        return $this->hasOne(AudiovisualSource::class);
     }
 }
