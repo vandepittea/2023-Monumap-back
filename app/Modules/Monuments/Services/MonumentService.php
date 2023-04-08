@@ -197,19 +197,21 @@ class MonumentService extends Service
             return $this->_model->create($monumentData);
         }
         
-        private function createImages($imagesUrl, $imagesCaption, $monumentId)
+        private function createImages($imagesUrl, $imagesCaption, $monument)
         {
             $images = json_decode($imagesUrl, true);
             $captions = json_decode($imagesCaption, true);
         
-            foreach ($images as $key => $image) {
-                Image::create([
-                    'monument_id' => $monumentId,
+            $imagesData = array_map(function ($key, $image) use ($captions, $monument) {
+                return [
                     'url' => $image,
                     'caption' => $captions[$key],
-                ]);
-            }
-        }    
+                    'monument_id' => $monument->id
+                ];
+            }, array_keys($images), $images);
+        
+            $monument->images()->createMany($imagesData);
+        }           
         
         private function updateMonumentData($monument, $monumentData) {
             $monument->update($monumentData);
