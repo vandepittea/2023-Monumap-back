@@ -17,8 +17,8 @@ class Location extends Model
         'city',
     ];
 
-    public function monument()
+    public function monuments()
     {
-        return $this->hasOne(Monument::class);
+        return $this->hasMany(Monument::class);
     }
 }

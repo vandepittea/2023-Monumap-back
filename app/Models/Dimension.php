@@ -17,6 +17,6 @@ class Dimension extends Model
 
     public function monument()
     {
-        return $this->hasOne(Monument::class);
+        return $this->hasMany(Monument::class);
     }
 }
