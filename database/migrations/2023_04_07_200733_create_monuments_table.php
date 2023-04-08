@@ -36,7 +36,7 @@ return new class extends Migration
                 'low-slope ramps',
                 'power-assisted doors',
                 'elevators, accessible washrooms'
-            ]);
+            ])->nullable();
             $table->json('used_materials')->nullable();
             $table->foreignId('dimensions_id')->nullable()->constrained('dimensions')->onDelete('cascade');
             $table->integer('weight')->nullable();

@@ -27,6 +27,11 @@ class Monument extends Model
         'used_materials' => 'array',
     ];
 
+    protected $attributes = [
+        'type' => 'Historical Buildings and Sites',
+        'language' => 'Dutch',
+    ];
+
     public function location()
     {
         return $this->belongsTo(Location::class);

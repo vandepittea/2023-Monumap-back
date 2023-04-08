@@ -17,6 +17,10 @@ class AudiovisualSource extends Model
         'type',
     ];
 
+    protected $attributes = [
+        'type' => 'video',
+    ];
+
     public function monument()
     {
         return $this->hasOne(Monument::class);
