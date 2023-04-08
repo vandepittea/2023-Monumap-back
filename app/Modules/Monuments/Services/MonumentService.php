@@ -70,7 +70,7 @@ class MonumentService extends Service
 
             $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
             $monument = $this->createMonument($monumentData);
-            
+
             $this->createImages($data['images_url'], $data['images_caption'], $monument->id);
         
             return $monument;
@@ -168,7 +168,7 @@ class MonumentService extends Service
         }                       
 
         public function getOneMonument($id){
-            return ["data" => $this->_model->find($id)];
+            return ["data" => $this->_model->with(['location', 'dimensions', 'images', 'audiovisualsource'])->find($id)];
         }
 
         public function updateMonument($id, $data){
