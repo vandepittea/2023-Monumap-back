@@ -57,7 +57,7 @@ class MonumentService extends Service
         }
 
         public function getAllMonuments($pages = 10, $parameterName = null, $parameterValue = null) {
-            $monuments = $this->_model->paginate($pages)->withQueryString();
+            $monuments = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images'])->paginate($pages)->withQueryString();
         
             if (!is_null($parameterName) && !is_null($parameterValue)) {
                 $monuments = $monuments->where($parameterName, $parameterValue);
