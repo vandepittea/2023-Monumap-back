@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('audiovisual_source', function (Blueprint $table) {
+        Schema::create('audiovisual_sources', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->string('url');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('audiovisual_source');
+        Schema::dropIfExists('audiovisual_sources');
     }
 };
