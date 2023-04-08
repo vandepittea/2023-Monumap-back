@@ -41,8 +41,7 @@ return new class extends Migration
             $table->foreignId('dimensions_id')->nullable()->constrained('dimensions')->onDelete('cascade');
             $table->integer('weight')->nullable();
             $table->decimal('cost_to_construct', 10, 2)->nullable();
-            $table->foreignId('images_id')->nullable()->constrained('images')->onDelete('cascade');
-            $table->foreignId('audiovisual_sources_id')->nullable()->constrained('audiovisual_sources')->onDelete('cascade');
+            $table->foreignId('audiovisual_source_id')->nullable()->constrained('audiovisual_source')->onDelete('cascade');
             $table->enum('language', [
                 'Dutch',
                 'English'

@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('audiovisual_sources', function (Blueprint $table) {
+        Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->unsignedBigInteger('monument_id');
             $table->string('url');
-            $table->enum('audiovisual_source_type', [
-                'audio',
-                'video'
-            ]);
+            $table->string('caption');
             $table->timestamps();
+
+            $table->foreign('monument_id')->references('id')->on('monuments')->onDelete('cascade');
         });
     }
 
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('audiovisual_sources');
+        Schema::dropIfExists('images');
     }
 };
