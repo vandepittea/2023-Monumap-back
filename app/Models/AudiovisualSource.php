@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class AudiovisualSource extends Model
 {
     use HasFactory;
-    
+
+    protected $table = 'audiovisual_source';
+
     protected $fillable = [
         'title',
         'url',
@@ -17,6 +19,6 @@ class AudiovisualSource extends Model
 
     public function monuments()
     {
-        return $this->belongsTo(Monument::class);
+        return $this->hasOne(Monument::class);
     }
 }
