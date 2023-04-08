@@ -40,6 +40,12 @@ class MonumentSeeder extends Seeder
                 'depth' => $data['dimensions_depth'],
             ]);
 
+            $audiovisual = AudiovisualSource::create([
+                'title' => $data['audiovisual_source_title'],
+                'url' => $data['audiovisual_source_url'],
+                'type' => $data['audiovisual_source_type'],
+            ]);
+
             $monument = Monument::create([
                 'name' => $data['name'],
                 'description' => $data['description'],
@@ -53,30 +59,20 @@ class MonumentSeeder extends Seeder
                 'dimensions_id' => $dimension->id,
                 'weight' => $data['weight'] ?: null,
                 'cost_to_construct' => $data['cost_to_construct'] ?: null,
+                'audiovisual_source_id' => $audiovisual->id,
                 'language' => $data['language'],
             ]);
 
-           /* $images = json_decode($data['images_url'], true);
+            $images = json_decode($data['images_url'], true);
             $captions = json_decode($data['images_caption'], true);
             
             foreach ($images as $key => $image) {
                 $img = Image::create([
+                    'monument_id' => $monument->id,
                     'url' => $image,
                     'caption' => $captions[$key],
                 ]);
-                $monument->images()->attach($img->id);
             }
-
-            $audiovisualSources = json_decode($data['audiovisual_sources_url'], true);
-
-            foreach ($audiovisualSources as $audiovisualSource) {
-                $audiovisual = AudiovisualSource::create([
-                    'title' => $data['audiovisual_sources_title'],
-                    'url' => $audiovisualSource,
-                    'type' => $data['audiovisual_sources_type'],
-                ]);
-                $monument->audiovisualSources()->attach($audiovisual->id);
-            }*/
         }
 
         fclose($file);
