@@ -36,8 +36,8 @@ class MonumentService extends Service
                     'Natural Monuments,Tombs and Mausoleums',
                 ]),
             ],
-            'year_of_construction' => 'required|integer|min:1000|max:2023',
-            'monument_designer' => 'required|string',
+            'year_of_construction' => 'required|integer|max:2023',
+            'monument_designer' => 'required|string|max:50',
             'accessibility' => [
                 'required',
                 'array',
@@ -57,7 +57,7 @@ class MonumentService extends Service
             'weight' => 'nullable|numeric',
             'cost_to_construct' => 'nullable|numeric',
             'images.*.url' => 'required|url',
-            'images.*.caption' => 'nullable|string|max:255',
+            'images.*.caption' => 'nullable|string|max:50',
             'audiovisual_source.url' => 'nullable|url',
             'audiovisual_source.type' => [
                 'nullable',
