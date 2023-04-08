@@ -49,7 +49,7 @@ class MonumentService extends Service
         "weight" => "nullable|integer",
         "costToConstruct" => "nullable|numeric",
         "images" => "required|json",
-        "audiovisualSources" => "nullable|json"
+        "audiovisualSource" => "nullable|json"
     ];
 
         public function __construct(Monument $model) {

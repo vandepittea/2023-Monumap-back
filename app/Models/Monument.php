@@ -42,7 +42,7 @@ class Monument extends Model
         return $this->hasMany(MonumentImage::class);
     }
 
-    public function audiovisualSources()
+    public function audiovisualSource()
     {
         return $this->hasOne(AudiovisualSource::class);
     }
