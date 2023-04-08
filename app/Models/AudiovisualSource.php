@@ -17,7 +17,7 @@ class AudiovisualSource extends Model
         'type',
     ];
 
-    public function monuments()
+    public function monument()
     {
         return $this->hasOne(Monument::class);
     }

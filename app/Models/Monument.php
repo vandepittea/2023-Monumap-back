@@ -44,6 +44,6 @@ class Monument extends Model
 
     public function audiovisualSource()
     {
-        return $this->hasOne(AudiovisualSource::class);
+        return $this->belongsTo(AudiovisualSource::class);
     }
 }

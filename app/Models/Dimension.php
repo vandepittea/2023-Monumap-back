@@ -15,7 +15,7 @@ class Dimension extends Model
         'depth',
     ];
 
-    public function monument()
+    public function monuments()
     {
         return $this->hasMany(Monument::class);
     }

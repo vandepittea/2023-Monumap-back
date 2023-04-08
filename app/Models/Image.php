@@ -10,6 +10,7 @@ class Image extends Model
     use HasFactory;
 
     protected $fillable = [
+        'monument_id',
         'url',
         'caption',
     ];
