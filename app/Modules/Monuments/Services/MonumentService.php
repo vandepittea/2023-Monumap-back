@@ -57,7 +57,7 @@ class MonumentService extends Service
         }
 
         public function getAllMonuments($pages = 10, $parameterName = null, $parameterValue = null) {
-            $monuments = $this->_model->paginate($pages)->withQueryString();
+            $monuments = $this->_model->orderBy('name' , 'desc')->paginate($pages)->withQueryString();
         
             if (!is_null($parameterName) && !is_null($parameterValue)) {
                 $monuments = $monuments->where($parameterName, $parameterValue);
@@ -85,13 +85,8 @@ class MonumentService extends Service
             if($this->hasErrors()){
                 return;
             }
-
-            $monument = $this->_model->find($id);
-
-            if ($monument) {
-                $monument->update($data); 
-            }
-            return $monument;
+            
+            return $this->_model->where("id", $id)->update($data);
         }
 
         public function deleteMonument($id) {
