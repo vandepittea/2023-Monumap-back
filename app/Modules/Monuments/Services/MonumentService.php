@@ -11,46 +11,63 @@ use Illuminate\Validation\Rule;
 
 class MonumentService extends Service
 {
-    protected $_rules = [
-        "id" => "required",
-        "name" => "required|string|max:50",
-        "description" => "required|string",
-        "location" => "required|json",
-        "historicalSignificance" => "nullable|string",
-        "type" => [
-            "required", "string",
-            Rule::in([
-                'War Memorials',
-                'Statues and Sculptures',
-                'Historical Buildings and Sites',
-                'National Monuments',
-                'Archaeological Sites',
-                'Cultural and Religious Monuments',
-                'Public Art Installations',
-                'Memorials for Historical Events',
-                'Natural Monuments,Tombs and Mausoleums'
-            ])
-        ],
-        "yearOfContstruction" => "required|year",
-        "monumentDesigner" => "required|string",
-        "accessibility" => [
-            "required",
-            "array",
-            Rule::in([
-                'wheelchair-friendly',
-                'near parking areas',
-                'low-slope ramps',
-                'power-assisted doors',
-                'elevators, accessible washrooms'
-            ])
-        ],
-        "usedMaterials" => "nullable|array",
-        "dimensions" => "nullable|json",
-        "weight" => "nullable|integer",
-        "costToConstruct" => "nullable|numeric",
-        "images" => "required|json",
-        "audiovisualSource" => "nullable|json"
-    ];
+        protected $_rules = [
+            'id' => 'required',
+            'name' => 'required|string|max:50',
+            'description' => 'required|string',
+            'location.latitude' => 'required|numeric|between:-90,90',
+            'location.longitude' => 'required|numeric|between:-180,180',
+            'location.street' => 'required|string|max:50',
+            'location.number' => 'required|numeric|max:99999',
+            'location.city' => 'required|string|max:50',
+            'historical_significance' => 'nullable|string',
+            'type' => [
+                'required',
+                'string',
+                Rule::in([
+                    'War Memorials',
+                    'Statues and Sculptures',
+                    'Historical Buildings and Sites',
+                    'National Monuments',
+                    'Archaeological Sites',
+                    'Cultural and Religious Monuments',
+                    'Public Art Installations',
+                    'Memorials for Historical Events',
+                    'Natural Monuments,Tombs and Mausoleums',
+                ]),
+            ],
+            'year_of_construction' => 'required|integer|min:1000|max:2023',
+            'monument_designer' => 'required|string',
+            'accessibility' => [
+                'required',
+                'array',
+                Rule::in([
+                    'wheelchair-friendly',
+                    'near parking areas',
+                    'low-slope ramps',
+                    'power-assisted doors',
+                    'elevators',
+                    'accessible washrooms',
+                ]),
+            ],
+            'used_materials' => 'nullable|array',
+            'dimensions.height' => 'nullable|numeric',
+            'dimensions.width' => 'nullable|numeric',
+            'dimensions.depth' => 'nullable|numeric',
+            'weight' => 'nullable|numeric',
+            'cost_to_construct' => 'nullable|numeric',
+            'images.*.url' => 'required|url',
+            'images.*.caption' => 'nullable|string|max:255',
+            'audiovisual_source.url' => 'nullable|url',
+            'audiovisual_source.type' => [
+                'nullable',
+                'string',
+                Rule::in([
+                    'audio',
+                    'video',
+                ]),
+            ],
+        ];    
 
         public function __construct(Monument $model) {
             Parent::__construct($model);
