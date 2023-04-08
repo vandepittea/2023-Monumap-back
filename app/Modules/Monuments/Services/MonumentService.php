@@ -78,41 +78,29 @@ class MonumentService extends Service
         
         private function getLocation($data)
         {
-            $locationQuery = Location::where('latitude', $data['latitude'])
-                ->where('longitude', $data['longitude'])
-                ->where('city', $data['city']);
-        
-            if (isset($data['street'])) {
-                $locationQuery->where('street', $data['street']);
-            }
-        
-            if (isset($data['number'])) {
-                $locationQuery->where('number', $data['number']);
-            }
-        
-            $location = $locationQuery->first();
-        
-            if (!$location) {
-                $location = Location::create($data);
-            }
+            $location = Location::firstOrCreate(
+                [
+                    'latitude' => $data['latitude'],
+                    'longitude' => $data['longitude'],
+                    'city' => $data['city'],
+                    'street' => $data['street'] ?? null,
+                    'number' => $data['number'] ?? null,
+                ]
+            );
         
             return $location;
-        }
+        }        
         
         private function getDimensions($data)
         {
-            $dimensionsQuery = Dimension::where('height', $data['height'])
-                ->where('width', $data['width'])
-                ->where('depth', $data['depth']);
-        
-            $dimensions = $dimensionsQuery->first();
-        
-            if (!$dimensions) {
-                $dimensions = Dimension::create($data);
-            }
+            $dimensions = Dimension::firstOrCreate([
+                'height' => $data['height'],
+                'width' => $data['width'],
+                'depth' => $data['depth']
+            ], $data);
         
             return $dimensions;
-        }
+        }        
         
         private function getAudiovisualSource($data)
         {
@@ -122,8 +110,10 @@ class MonumentService extends Service
                 'type' => $data['audiovisual_type']
             ]);
         
-            return AudiovisualSource::create($audiovisualSourceData);
-        }
+            $audiovisualSource = AudiovisualSource::firstOrCreate($audiovisualSourceData);
+        
+            return $audiovisualSource;
+        }        
         
         private function getMonumentData($data, $locationId, $dimensionsId, $audiovisualSourceId)
         {
