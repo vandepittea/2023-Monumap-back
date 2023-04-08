@@ -56,6 +56,16 @@ class MonumentService extends Service
             Parent::__construct($model);
         }
 
+        public function getAllMonuments($pages = 10, $parameterName = null, $parameterValue = null) {
+            $monuments = $this->_model->paginate($pages)->withQueryString();
+        
+            if (!is_null($parameterName) && !is_null($parameterValue)) {
+                $monuments = $monuments->where($parameterName, $parameterValue);
+            }
+        
+            return $monuments;
+        }
+
         public function addMonument($data)
         {
             $this->validate($data);
