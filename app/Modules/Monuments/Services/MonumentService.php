@@ -64,9 +64,9 @@ class MonumentService extends Service
                 return;
             }
         
-            $location = $this->getLocation($data);
-            $dimensions = $this->getDimensions($data);
-            $audiovisualSource = $this->getAudiovisualSource($data);
+            $location = $this->getOrCreateLocation($data);
+            $dimensions = $this->getOrCreateDimensions($data);
+            $audiovisualSource = $this->getOrCreateAudiovisualSource($data);
 
             $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
             $monument = $this->createMonument($monumentData);
@@ -75,8 +75,51 @@ class MonumentService extends Service
         
             return $monument;
         }
+
+        public function getOneMonument($id){
+            return ["data" => $this->_model->with(['location', 'dimensions', 'images', 'audiovisualsource'])->find($id)];
+        }
+
+        public function updateMonument($id, $data){
+            $this->validate($data);
         
-        private function getLocation($data)
+            if($this->hasErrors()){
+                return;
+            }
+        
+            $monument = $this->_model->find($id);
+            if (!$monument) {
+                return;
+            }
+        
+            $oldLocationId = $monument->location_id;
+            $oldDimensionsId = $monument->dimensions_id;
+            $oldAudiovisualSourceId = $monument->audiovisual_source_id;
+        
+            $newLocation = $this->getOrCreateLocation($data);
+            $newDimensions = $this->getOrCreateDimensions($data);
+            $newAudiovisualSource = $this->getOrCreateAudiovisualSource($data);
+        
+            $monumentData = $this->getMonumentData($data, $newLocation->id, $newDimensions->id, $newAudiovisualSource->id);
+            $this->updateMonumentData($monument, $monumentData);
+
+            $this->deleteUnusedLocations($oldLocationId);
+            $this->deleteUnusedDimensions($oldDimensionsId);
+            $this->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
+
+            $this->deleteImages($id);
+            $this->createImages($data['images_url'], $data['images_caption'], $id);
+        }
+
+        public function deleteMonument($id) {
+            $monument = $this->_model->find($id);
+
+            if($monument){
+                $monument->delete();
+            }
+        }
+
+        private function getOrCreateLocation($data)
         {
             $location = Location::firstOrCreate(
                 [
@@ -91,7 +134,7 @@ class MonumentService extends Service
             return $location;
         }        
         
-        private function getDimensions($data)
+        private function getOrCreateDimensions($data)
         {
             $dimensions = Dimension::firstOrCreate([
                 'height' => $data['height'],
@@ -102,7 +145,7 @@ class MonumentService extends Service
             return $dimensions;
         }        
         
-        private function getAudiovisualSource($data)
+        private function getOrCreateAudiovisualSource($data)
         {
             $audiovisualSourceData = array_filter([
                 'title' => $data['audiovisual_title'],
@@ -113,7 +156,8 @@ class MonumentService extends Service
             $audiovisualSource = AudiovisualSource::firstOrCreate($audiovisualSourceData);
         
             return $audiovisualSource;
-        }        
+        }
+           
         
         private function getMonumentData($data, $locationId, $dimensionsId, $audiovisualSourceId)
         {
@@ -155,27 +199,25 @@ class MonumentService extends Service
                     'caption' => $captions[$key],
                 ]);
             }
-        }                       
-
-        public function getOneMonument($id){
-            return ["data" => $this->_model->with(['location', 'dimensions', 'images', 'audiovisualsource'])->find($id)];
-        }
-
-        public function updateMonument($id, $data){
-            $this->validate($data);
-            if($this->hasErrors()){
-                return;
-            }
-
-            return $this->_model->where("id", $id)->update($data);
-        }
-
-        public function deleteMonument($id) {
-            $monument = $this->_model->find($id);
-
-            if($monument){
-                $monument->delete();
-            }
+        }    
+        
+        private function updateMonumentData($monument, $monumentData) {
+            $monument->update($monumentData);
         }
         
+        private function deleteUnusedLocations($oldLocationId) {
+            Location::where('id', $oldLocationId)->whereDoesntHave('monuments')->delete();
+        }
+        
+        private function deleteUnusedDimensions($oldDimensionsId) {
+            Dimension::where('id', $oldDimensionsId)->whereDoesntHave('monuments')->delete();
+        }
+        
+        private function deleteUnusedAudiovisualSources($oldAudiovisualSourceId) {
+            AudiovisualSource::where('id', $oldAudiovisualSourceId)->whereDoesntHave('monuments')->delete();
+        }
+        
+        private function deleteImages($id) {
+            Image::where('monument_id', $id)->delete();
+        }        
 }
