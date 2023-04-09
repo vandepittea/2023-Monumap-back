@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Modules\Monuments\Services\MonumentService;
 
-
 class MonumentApiController extends Controller
 {
     private $_service;

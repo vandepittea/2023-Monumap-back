@@ -23,8 +23,9 @@ class Service {
         $validator = Validator::make($data, $this->_rules);
         if($validator->fails()){
             $this->_errors = $validator->errors();
-            return;
         }
+
+        return $validator;
     }
 
     public function hasErrors(){
