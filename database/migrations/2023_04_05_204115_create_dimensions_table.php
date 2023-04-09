@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('dimensions', function (Blueprint $table) {
             $table->id();
             $table->double('height');
-            $table->double('width');
-            $table->double('depth');
+            $table->double('width')->nullable();
+            $table->double('depth')->nullable();
             $table->timestamps();
         });
     }
