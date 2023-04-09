@@ -73,13 +73,24 @@ class MonumentService extends Service
             Parent::__construct($model);
         }
 
-        public function getAllMonuments($pages = 10, $parameterName = null, $parameterValue = null) {
-            $monuments = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images'])->paginate($pages)->withQueryString();
-        
-            if (!is_null($parameterName) && !is_null($parameterValue)) {
-                $monuments = $monuments->where($parameterName, $parameterValue);
-            }
-        
+        public function getAllMonuments($pages = 10, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
+            $monuments = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images'])
+                                       ->when($type, function ($query, $type) {
+                                            return $query->ofType($type);
+                                        })
+                                       ->when($year, function ($query, $year) {
+                                            return $query->ofOfYearOfConstruction($year);
+                                        })
+                                       ->when($designer, function ($query, $designer) {
+                                            return $query->OfMonumentDesigner($designer);
+                                        })
+                                       ->when($cost, function ($query, $cost) {
+                                            return $query->ofOfCostToConstruct($cost);
+                                        })
+                                       ->when($language, function ($query, $language) {
+                                            return $query->ofLanguage($language);
+                                        })
+                                       ->paginate($pages)->withQueryString();
             return $monuments;
         }
 
