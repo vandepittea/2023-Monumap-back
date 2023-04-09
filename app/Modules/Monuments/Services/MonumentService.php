@@ -107,7 +107,7 @@ class MonumentService extends Service
         }
 
         public function getOneMonument($id){
-            return ["data" => $this->_model->with(['location', 'dimensions', 'images', 'audiovisualsource'])->find($id)];
+            return ["data" => $this->_model->with(['location', 'dimensions', 'images', 'audiovisualSource'])->find($id)];
         }
 
         public function updateMonument($id, $data)
@@ -129,16 +129,21 @@ class MonumentService extends Service
                 $oldLocationId = $monument->location_id;
                 $oldDimensionsId = $monument->dimensions_id;
                 $oldAudiovisualSourceId = $monument->audiovisual_source_id;
-                
-                $location = $this->updateLocation($monument->location, $data);
-                $dimensions = $this->updateDimensions($monument->dimensions, $data);
-                $audiovisualSource = $this->updateAudiovisualSource($monument->audiovisualSource, $data);
-
-                $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
-
+            
+                $newLocation = $this->getOrCreateLocation($data['location']);
+                $newDimensions = $this->getOrCreateDimensions($data['dimensions']);
+                $newAudiovisualSource = $this->getOrCreateAudiovisualSource($data['audiovisual_source']);
+            
+                $monumentData = $this->getMonumentData($data, $newLocation->id, $newDimensions->id, $newAudiovisualSource->id);
                 $this->updateMonumentData($monument, $monumentData);
-                $this->updateImages($data['images'], $monument->id);
-                
+    
+                $this->deleteUnusedLocations($oldLocationId);
+                $this->deleteUnusedDimensions($oldDimensionsId);
+                $this->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
+    
+                $this->deleteImages($id);
+                $this->createImages($data['images_url'], $data['images_caption'], $id);
+    
                 DB::commit();
 
                 return $monument;
