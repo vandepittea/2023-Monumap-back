@@ -4,12 +4,12 @@ namespace App\Modules\Monuments\Services;
 use App\Models\Monument;
 use App\Modules\Core\Services\Service;
 use App\Modules\Core\Services\ServiceLanguages;
+use App\Modules\Monuments\Services\LocationService;
+use App\Modules\Monuments\Services\DimensionService;
+use App\Modules\Monuments\Services\AudiovisualSourceService;
+use App\Modules\Monuments\Services\ImageService;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use App\Models\Location;
-use App\Models\Dimension;
-use App\Models\Image;
-use App\Models\AudiovisualSource;
 
 class MonumentService extends Service
 {
@@ -17,31 +17,32 @@ class MonumentService extends Service
             'id' => 'required',
             'name' => 'required|string|max:50',
             'description' => 'required|string',
-            'location.latitude' => 'required|numeric|between:-90,90',
-            'location.longitude' => 'required|numeric|between:-180,180',
-            'location.street' => 'required|string|max:50',
-            'location.number' => 'required|numeric|max:99999',
-            'location.city' => 'required|string|max:50',
+            'location' => 'required',
             'historical_significance' => 'nullable|string',
             'type' => 'required|string|in:War Memorials,Statues and Sculptures,Historical Buildings and Sites,National Monuments,Archaeological Sites,Cultural and Religious Monuments,Public Art Installations,Memorials for Historical Events,Natural Monuments,Tombs and Mausoleums',
             'year_of_construction' => 'required|integer|max:2023',
             'monument_designer' => 'required|string|max:50',
-            'accessibility' => 'required|array|in:wheelchair-friendly,near parking areas,low-slope ramps,power-assisted doors,elevators,accessible washrooms',
+            'accessibility' => 'nullable|array|in:wheelchair-friendly,near parking areas,low-slope ramps,power-assisted doors,elevators,accessible washrooms',
             'used_materials' => 'nullable|array',
-            'dimensions.height' => 'nullable|numeric',
-            'dimensions.width' => 'nullable|numeric',
-            'dimensions.depth' => 'nullable|numeric',
+            'dimensions' => 'nullable',
             'weight' => 'nullable|numeric',
             'cost_to_construct' => 'nullable|numeric',
-            'images.*.url' => 'required|url',
-            'images.*.caption' => 'nullable|string|max:50',
-            'audiovisual_source.title' => 'nullable|string',
-            'audiovisual_source.url' => 'nullable|url',
-            'audiovisual_source.type' => 'nullable|string|in:audio,video',
+            'images' => 'required',
+            'audiovisual_source' => 'nullable',
+            'languages' => 'required|string'
         ];    
 
-        public function __construct(Monument $model) {
+        private $_locationService;
+        private $_dimensionService;
+        private $_audiovisualSourceService;
+        private $_imageService;
+
+        public function __construct(Monument $model, LocationService $locationService, DimensionService $dimensionService, AudiovisualSourceService $audiovisualSourceService, ImageService $imageService) {
             Parent::__construct($model);
+            $this->_locationService = $locationService;
+            $this->_dimensionService = $dimensionService;
+            $this->_audiovisualSourceService = $audiovisualSourceService;
+            $this->_imageService = $imageService;
         }
 
         public function getAllMonuments($pages = 10, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
@@ -76,14 +77,14 @@ class MonumentService extends Service
             DB::beginTransaction();
         
             try {
-                $location = $this->getOrCreateLocation($data['location']);
-                $dimensions = $this->getOrCreateDimensions($data['dimensions']);
-                $audiovisualSource = $this->getOrCreateAudiovisualSource($data['audiovisual_source']);
+                $location = $this->_locationService->getOrCreateLocation($data['location']);
+                $dimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions']);
+                $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source']);
         
                 $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
                 $monument = $this->createMonument($monumentData);
         
-                $this->createImages($data['images']['urls'], $data['images']['captions'], $monument);
+                $this->_imageService->createImages($data['images']['urls'], $data['images']['captions'], $monument);
         
                 DB::commit();
         
@@ -134,19 +135,19 @@ class MonumentService extends Service
                 $oldDimensionsId = $monument->dimensions_id;
                 $oldAudiovisualSourceId = $monument->audiovisual_source_id;
             
-                $newLocation = $this->getOrCreateLocation($data['location']);
-                $newDimensions = $this->getOrCreateDimensions($data['dimensions']);
-                $newAudiovisualSource = $this->getOrCreateAudiovisualSource($data['audiovisual_source']);
+                $newLocation = $this->_locationService->getOrCreateLocation($data['location']);
+                $newDimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions']);
+                $newAudiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source']);
             
                 $monumentData = $this->getMonumentData($data, $newLocation->id, $newDimensions->id, $newAudiovisualSource->id);
                 $this->updateMonumentData($monument, $monumentData);
     
-                $this->deleteUnusedLocations($oldLocationId);
-                $this->deleteUnusedDimensions($oldDimensionsId);
-                $this->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
+                $this->_locationService->deleteUnusedLocations($oldLocationId);
+                $this->_dimensionService->deleteUnusedDimensions($oldDimensionsId);
+                $this->_audiovisualSourceService->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
     
-                $this->deleteImages($id);
-                $this->createImages($data['images_url'], $data['images_caption'], $id);
+                $this->_imageService->deleteImages($id);
+                $this->_imageService->createImages($data['images_url'], $data['images_caption'], $id);
     
                 DB::commit();
 
@@ -167,48 +168,7 @@ class MonumentService extends Service
 
         public function deleteMultipleMonuments($ids) {
             $this->_model->destroy($ids);
-        }
-
-        private function getOrCreateLocation($locationData)
-        {
-            $location = Location::firstOrCreate(
-                [
-                    'latitude' => $locationData['latitude'],
-                    'longitude' => $locationData['longitude'],
-                    'city' => $locationData['city'],
-                    'street' => $locationData['street'] ?? null,
-                    'number' => $locationData['number'] ?? null,
-                ]
-            );
-        
-            return $location;
-        }        
-        
-        private function getOrCreateDimensions($dimensionsData)
-        {
-            $dimensions = Dimension::firstOrCreate([
-                    'height' => $dimensionsData['height'],
-                    'width' => $dimensionsData['width'],
-                    'depth' => $dimensionsData['depth']
-                ]
-            );
-        
-            return $dimensions;
-        }        
-        
-        private function getOrCreateAudiovisualSource($audiovisualSourceData)
-        {
-            $audiovisualSourceResult = array_filter([
-                'title' => $audiovisualSourceData['title'],
-                'url' => $audiovisualSourceData['url'],
-                'type' => $audiovisualSourceData['type']
-            ]);
-        
-            $audiovisualSource = AudiovisualSource::firstOrCreate($audiovisualSourceResult);
-        
-            return $audiovisualSource;
-        }
-           
+        }                  
         
         private function getMonumentData($data, $locationId, $dimensionsId, $audiovisualSourceId)
         {
@@ -236,41 +196,9 @@ class MonumentService extends Service
         private function createMonument($monumentData)
         {
             return $this->_model->create($monumentData);
-        }
-        
-        private function createImages($imagesUrl, $imagesCaption, $monument)
-        {
-            $images = json_decode($imagesUrl, true);
-            $captions = json_decode($imagesCaption, true);
-            
-            foreach ($images as $key => $image) {
-                $imagesData[] = [
-                    'url' => $image,
-                    'caption' => $captions[$key],
-                    'monument_id' => $monument->id
-                ];
-            }
-            
-            $monument->images()->createMany($imagesData);
-        }          
+        }        
         
         private function updateMonumentData($monument, $monumentData) {
             $monument->update($monumentData);
-        }
-        
-        private function deleteUnusedLocations($oldLocationId) {
-            Location::where('id', $oldLocationId)->whereDoesntHave('monuments')->delete();
-        }
-        
-        private function deleteUnusedDimensions($oldDimensionsId) {
-            Dimension::where('id', $oldDimensionsId)->whereDoesntHave('monuments')->delete();
-        }
-        
-        private function deleteUnusedAudiovisualSources($oldAudiovisualSourceId) {
-            AudiovisualSource::where('id', $oldAudiovisualSourceId)->whereDoesntHave('monuments')->delete();
-        }
-        
-        private function deleteImages($id) {
-            Image::where('monument_id', $id)->delete();
-        }        
+        }   
 }
