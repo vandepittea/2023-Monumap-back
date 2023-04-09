@@ -91,17 +91,26 @@ class MonumentService extends Service
                 return;
             }
         
-            $location = $this->getOrCreateLocation($data);
-            $dimensions = $this->getOrCreateDimensions($data);
-            $audiovisualSource = $this->getOrCreateAudiovisualSource($data);
-
-            $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
-            $monument = $this->createMonument($monumentData);
-
-            $this->createImages($data['images_url'], $data['images_caption'], $monument->id);
+            DB::beginTransaction();
         
-            return $monument;
-        }
+            try {
+                $location = $this->createLocation($data);
+                $dimensions = $this->createDimensions($data);
+                $audiovisualSource = $this->createAudiovisualSource($data);
+        
+                $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
+                $monument = $this->createMonument($monumentData);
+        
+                $this->createImages($data['images_url'], $data['images_caption'], $monument->id);
+        
+                DB::commit();
+        
+                return $monument;
+            } catch (\Exception $e) {
+                DB::rollback();
+                throw $e;
+            }
+        }        
 
         public function getOneMonument($id){
             return ["data" => $this->_model->with(['location', 'dimensions', 'images', 'audiovisualsource'])->find($id)];
