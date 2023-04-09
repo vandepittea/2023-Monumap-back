@@ -71,16 +71,14 @@ class MonumentApiController extends Controller
 
     public function deleteMultipleMonuments($ids)
     {
-        $this->_monumentService->deleteMultipleMonuments($ids);
+        $result = $this->_service->deleteMultipleMonuments($ids);
     
-        return response()->json(['message' => 'Multiple monuments deleted successfully']);
         if ($result) {
-            return response()->json(['message' => 'Monument deleted successfully']);
+            return response()->json(['message' => 'Multiple monuments deleted successfully']);
         } else {
-            return response()->json(['message' => 'Monument not found'], 404);
+            return response()->json(['message' => 'Monuments not found'], 404);
         }
     }
             
-    }
 }
 
