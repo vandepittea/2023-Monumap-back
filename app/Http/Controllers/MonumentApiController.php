@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Modules\Movies\Services\MonumentService;
+use App\Modules\Monuments\Services\MonumentService;
 
 
 class MonumentApiController extends Controller
