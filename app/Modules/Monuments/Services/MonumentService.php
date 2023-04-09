@@ -68,6 +68,10 @@ class MonumentService extends Service
         public function addMonument($data)
         {
             $this->validate($data);
+
+            if ($this->hasErrors()) {
+                return;
+            }
         
             DB::beginTransaction();
         
