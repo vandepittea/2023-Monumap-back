@@ -1,13 +1,15 @@
 <?php
-namespace App\Modules\Movies\Services;
+namespace App\Modules\Monuments\Services;
 
 use App\Models\Monument;
 use App\Modules\Core\Services\Service;
 use App\Modules\Core\Services\ServiceLanguages;
 use Illuminate\Validation\Rule;
-
-
-
+use Illuminate\Support\Facades\DB;
+use App\Models\Location;
+use App\Models\Dimension;
+use App\Models\Image;
+use App\Models\AudiovisualSource;
 
 class MonumentService extends Service
 {
@@ -21,35 +23,10 @@ class MonumentService extends Service
             'location.number' => 'required|numeric|max:99999',
             'location.city' => 'required|string|max:50',
             'historical_significance' => 'nullable|string',
-            'type' => [
-                'required',
-                'string',
-                Rule::in([
-                    'War Memorials',
-                    'Statues and Sculptures',
-                    'Historical Buildings and Sites',
-                    'National Monuments',
-                    'Archaeological Sites',
-                    'Cultural and Religious Monuments',
-                    'Public Art Installations',
-                    'Memorials for Historical Events',
-                    'Natural Monuments,Tombs and Mausoleums',
-                ]),
-            ],
+            'type' => 'required|string|in:War Memorials,Statues and Sculptures,Historical Buildings and Sites,National Monuments,Archaeological Sites,Cultural and Religious Monuments,Public Art Installations,Memorials for Historical Events,Natural Monuments,Tombs and Mausoleums',
             'year_of_construction' => 'required|integer|max:2023',
             'monument_designer' => 'required|string|max:50',
-            'accessibility' => [
-                'required',
-                'array',
-                Rule::in([
-                    'wheelchair-friendly',
-                    'near parking areas',
-                    'low-slope ramps',
-                    'power-assisted doors',
-                    'elevators',
-                    'accessible washrooms',
-                ]),
-            ],
+            'accessibility' => 'required|array|in:wheelchair-friendly,near parking areas,low-slope ramps,power-assisted doors,elevators,accessible washrooms',
             'used_materials' => 'nullable|array',
             'dimensions.height' => 'nullable|numeric',
             'dimensions.width' => 'nullable|numeric',
@@ -58,15 +35,9 @@ class MonumentService extends Service
             'cost_to_construct' => 'nullable|numeric',
             'images.*.url' => 'required|url',
             'images.*.caption' => 'nullable|string|max:50',
+            'audiovisual_source.title' => 'nullable|string',
             'audiovisual_source.url' => 'nullable|url',
-            'audiovisual_source.type' => [
-                'nullable',
-                'string',
-                Rule::in([
-                    'audio',
-                    'video',
-                ]),
-            ],
+            'audiovisual_source.type' => 'nullable|string|in:audio,video',
         ];    
 
         public function __construct(Monument $model) {
@@ -98,21 +69,17 @@ class MonumentService extends Service
         {
             $this->validate($data);
         
-            if ($this->hasErrors()) {
-                return;
-            }
-        
             DB::beginTransaction();
         
             try {
-                $location = $this->createLocation($data);
-                $dimensions = $this->createDimensions($data);
-                $audiovisualSource = $this->createAudiovisualSource($data);
+                $location = $this->getOrCreateLocation($data['location']);
+                $dimensions = $this->getOrCreateDimensions($data['dimensions']);
+                $audiovisualSource = $this->getOrCreateAudiovisualSource($data['audiovisual_source']);
         
                 $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
                 $monument = $this->createMonument($monumentData);
         
-                $this->createImages($data['images_url'], $data['images_caption'], $monument->id);
+                $this->createImages($data['images']['urls'], $data['images']['captions'], $monument);
         
                 DB::commit();
         
@@ -121,7 +88,23 @@ class MonumentService extends Service
                 DB::rollback();
                 throw $e;
             }
-        }        
+        }
+
+        public function addMultipleMonuments(array $monuments): void
+        {
+            DB::beginTransaction();
+    
+            try {
+                foreach ($monuments as $monumentData) {
+                    $this->addMonument($monumentData);
+                }
+    
+                DB::commit();
+            } catch (\Throwable $e) {
+                DB::rollback();
+                throw $e;
+            }
+        }
 
         public function getOneMonument($id){
             return ["data" => $this->_model->with(['location', 'dimensions', 'images', 'audiovisualsource'])->find($id)];
@@ -130,44 +113,40 @@ class MonumentService extends Service
         public function updateMonument($id, $data)
         {
             $this->validate($data);
-            
-            if($this->hasErrors()){
+
+            if ($this->hasErrors()) {
                 return;
             }
-            
+
             $monument = $this->_model->find($id);
             if (!$monument) {
                 return;
             }
-            
+
             DB::beginTransaction();
-            
+
             try {
                 $oldLocationId = $monument->location_id;
                 $oldDimensionsId = $monument->dimensions_id;
                 $oldAudiovisualSourceId = $monument->audiovisual_source_id;
-            
-                $newLocation = $this->getOrCreateLocation($data);
-                $newDimensions = $this->getOrCreateDimensions($data);
-                $newAudiovisualSource = $this->getOrCreateAudiovisualSource($data);
-            
-                $monumentData = $this->getMonumentData($data, $newLocation->id, $newDimensions->id, $newAudiovisualSource->id);
+                
+                $location = $this->updateLocation($monument->location, $data);
+                $dimensions = $this->updateDimensions($monument->dimensions, $data);
+                $audiovisualSource = $this->updateAudiovisualSource($monument->audiovisualSource, $data);
+
+                $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
+
                 $this->updateMonumentData($monument, $monumentData);
-            
-                $this->deleteUnusedLocations($oldLocationId);
-                $this->deleteUnusedDimensions($oldDimensionsId);
-                $this->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
-            
-                $this->deleteImages($id);
-                $this->createImages($data['images_url'], $data['images_caption'], $id);
+                $this->updateImages($data['images'], $monument->id);
                 
                 DB::commit();
-                
+
+                return $monument;
             } catch (\Exception $e) {
                 DB::rollback();
                 throw $e;
             }
-        }        
+        } 
 
         public function deleteMonument($id) {
             $monument = $this->_model->find($id);
@@ -181,41 +160,42 @@ class MonumentService extends Service
             $this->_model->destroy($ids);
         }
 
-        private function getOrCreateLocation($data)
+        private function getOrCreateLocation($locationData)
         {
             $location = Location::firstOrCreate(
                 [
-                    'latitude' => $data['latitude'],
-                    'longitude' => $data['longitude'],
-                    'city' => $data['city'],
-                    'street' => $data['street'] ?? null,
-                    'number' => $data['number'] ?? null,
+                    'latitude' => $locationData['latitude'],
+                    'longitude' => $locationData['longitude'],
+                    'city' => $locationData['city'],
+                    'street' => $locationData['street'] ?? null,
+                    'number' => $locationData['number'] ?? null,
                 ]
             );
         
             return $location;
         }        
         
-        private function getOrCreateDimensions($data)
+        private function getOrCreateDimensions($dimensionsData)
         {
             $dimensions = Dimension::firstOrCreate([
-                'height' => $data['height'],
-                'width' => $data['width'],
-                'depth' => $data['depth']
-            ], $data);
+                    'height' => $dimensionsData['height'],
+                    'width' => $dimensionsData['width'],
+                    'depth' => $dimensionsData['depth']
+                ]
+            );
         
             return $dimensions;
         }        
         
-        private function getOrCreateAudiovisualSource($data)
+        private function getOrCreateAudiovisualSource($audiovisualSourceData)
         {
-            $audiovisualSourceData = array_filter([
-                'title' => $data['audiovisual_title'],
-                'url' => $data['audiovisual_url'],
-                'type' => $data['audiovisual_type']
+            $audiovisualSourceResult = array_filter([
+                'title' => $audiovisualSourceData['title'],
+                'url' => $audiovisualSourceData['url'],
+                'type' => $audiovisualSourceData['type']
             ]);
         
-            $audiovisualSource = AudiovisualSource::firstOrCreate($audiovisualSourceData);
+            $audiovisualSource = AudiovisualSource::firstOrCreate($audiovisualSourceResult);
         
             return $audiovisualSource;
         }
@@ -253,17 +233,17 @@ class MonumentService extends Service
         {
             $images = json_decode($imagesUrl, true);
             $captions = json_decode($imagesCaption, true);
-        
-            $imagesData = array_map(function ($key, $image) use ($captions, $monument) {
-                return [
+            
+            foreach ($images as $key => $image) {
+                $imagesData[] = [
                     'url' => $image,
                     'caption' => $captions[$key],
                     'monument_id' => $monument->id
                 ];
-            }, array_keys($images), $images);
-        
+            }
+            
             $monument->images()->createMany($imagesData);
-        }           
+        }          
         
         private function updateMonumentData($monument, $monumentData) {
             $monument->update($monumentData);
