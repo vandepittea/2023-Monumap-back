@@ -17,7 +17,7 @@ class AudioVisualSourceService extends Service
             Parent::__construct($model);
         }  
         
-        public function getOrCreateAudiovisualSource($audiovisualSourceData)
+        public function getOrCreateAudiovisualSource($audiovisualSourceData, $monument)
         {
             $this->validate($audiovisualSourceData);
 
@@ -31,9 +31,7 @@ class AudioVisualSourceService extends Service
                 'type' => $audiovisualSourceData['type']
             ]);
         
-            $audiovisualSource = $this->_model->firstOrCreate($audiovisualSourceResult);
-        
-            return $audiovisualSource;
+            $monument->audiovisualSource()->create($audiovisualSourceResult);
         }
 
         public function deleteUnusedAudiovisualSources($oldAudiovisualSourceId) {

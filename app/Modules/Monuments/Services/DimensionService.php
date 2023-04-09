@@ -17,23 +17,22 @@ class DimensionService extends Service
             Parent::__construct($model);
         }   
 
-        public function getOrCreateDimensions($dimensionsData)
+        public function getOrCreateDimensions($dimensionsData, $monument)
         {
             $this->validate($dimensionsData);
-
+        
             if ($this->hasErrors()) {
                 return;
             }
-
-            $dimensions = $this->_model->firstOrCreate([
-                    'height' => $dimensionsData['height'],
-                    'width' => $dimensionsData['width'],
-                    'depth' => $dimensionsData['depth']
-                ]
-            );
         
-            return $dimensions;
-        }
+            $dimensionData = [
+                'height' => $dimensionsData['height'],
+                'width' => $dimensionsData['width'],
+                'depth' => $dimensionsData['depth']
+            ];
+        
+            $monument->dimension()->create($dimensionData);
+        }        
         
         public function deleteUnusedDimensions($oldDimensionsId) {
             $this->_model->where('id', $oldDimensionsId)->whereDoesntHave('monuments')->delete();

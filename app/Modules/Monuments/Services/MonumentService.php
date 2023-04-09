@@ -78,12 +78,17 @@ class MonumentService extends Service
         
             try {
                 $location = $this->_locationService->getOrCreateLocation($data['location']);
-                $dimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions']);
-                $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source']);
         
-                $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
+                $monumentData = $this->getMonumentData($data, $location->id);
                 $monument = $this->createMonument($monumentData);
         
+                if (isset($data['dimensions'])) {
+                    $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                }
+                if (isset($data['audiovisual_source'])) {
+                    $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                }
+                
                 $this->_imageService->createImages($data['images']['urls'], $data['images']['captions'], $monument);
         
                 DB::commit();
@@ -136,18 +141,23 @@ class MonumentService extends Service
                 $oldAudiovisualSourceId = $monument->audiovisual_source_id;
             
                 $newLocation = $this->_locationService->getOrCreateLocation($data['location']);
-                $newDimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions']);
-                $newAudiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source']);
             
                 $monumentData = $this->getMonumentData($data, $newLocation->id, $newDimensions->id, $newAudiovisualSource->id);
                 $this->updateMonumentData($monument, $monumentData);
-    
-                $this->_locationService->deleteUnusedLocations($oldLocationId);
-                $this->_dimensionService->deleteUnusedDimensions($oldDimensionsId);
-                $this->_audiovisualSourceService->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
+
+                if (isset($data['dimensions'])) {
+                    $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                }
+                if (isset($data['audiovisual_source'])) {
+                    $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                }
     
                 $this->_imageService->deleteImages($id);
                 $this->_imageService->createImages($data['images_url'], $data['images_caption'], $id);
+
+                $this->_locationService->deleteUnusedLocations($oldLocationId);
+                $this->_dimensionService->deleteUnusedDimensions($oldDimensionsId);
+                $this->_audiovisualSourceService->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
     
                 DB::commit();
 
@@ -170,7 +180,7 @@ class MonumentService extends Service
             $this->_model->destroy($ids);
         }                  
         
-        private function getMonumentData($data, $locationId, $dimensionsId, $audiovisualSourceId)
+        private function getMonumentData($data, $locationId)
         {
             $monumentData = array_intersect_key($data, array_flip([
                 'name',
@@ -187,8 +197,6 @@ class MonumentService extends Service
             ]));
         
             $monumentData['location_id'] = $locationId;
-            $monumentData['dimensions_id'] = $dimensionsId;
-            $monumentData['audiovisual_source_id'] = $audiovisualSourceId;
         
             return $monumentData;
         }
