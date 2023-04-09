@@ -177,6 +177,10 @@ class MonumentService extends Service
             }
         }
 
+        public function deleteMultipleMonuments($ids) {
+            $this->_model->destroy($ids);
+        }
+
         private function getOrCreateLocation($data)
         {
             $location = Location::firstOrCreate(
