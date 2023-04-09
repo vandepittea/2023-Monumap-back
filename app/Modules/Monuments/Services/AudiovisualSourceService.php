@@ -22,7 +22,7 @@ class AudioVisualSourceService extends Service
             $this->validate($audiovisualSourceData);
 
             if ($this->hasErrors()) {
-                return;
+                throw new ValidationException($validator);
             }
 
             $audiovisualSourceResult = array_filter([

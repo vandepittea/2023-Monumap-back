@@ -24,7 +24,7 @@ class LocationService extends Service
             $this->validate($locationData);
 
             if ($this->hasErrors()) {
-                return;
+                throw new ValidationException($validator);
             }
 
             $location = $this->_model->firstOrCreate(

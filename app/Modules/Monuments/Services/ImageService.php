@@ -32,7 +32,7 @@ class ImageService extends Service
                 $this->validate($imagesData);
 
                 if ($this->hasErrors()) {
-                    return;
+                    throw new ValidationException($validator);
                 }
             }
             

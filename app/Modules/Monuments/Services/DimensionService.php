@@ -22,7 +22,7 @@ class DimensionService extends Service
             $this->validate($dimensionsData);
         
             if ($this->hasErrors()) {
-                return;
+                throw new ValidationException($validator);
             }
         
             $dimensionData = [

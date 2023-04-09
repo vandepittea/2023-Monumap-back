@@ -71,7 +71,7 @@ class MonumentService extends Service
             $this->validate($data);
 
             if ($this->hasErrors()) {
-                return;
+                throw new ValidationException($validator);
             }
         
             DB::beginTransaction();
@@ -125,7 +125,7 @@ class MonumentService extends Service
             $this->validate($data);
 
             if ($this->hasErrors()) {
-                return;
+                throw new ValidationException($validator);
             }
 
             $monument = $this->_model->find($id);
