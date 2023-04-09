@@ -47,7 +47,12 @@ class MonumentApiController extends Controller
     }
 
     public function getOneMonument($id){
+        if($this->_service->hasErrors()){
+            return ["errors" => $this->_service->getErrors()];
+        }
+
         return $this->_service->getOneMonument($id);
+
     }
 
     public function updateMonument($id, Request $request){
@@ -62,6 +67,20 @@ class MonumentApiController extends Controller
         } else {
             return response()->json(['message' => 'Monument not found'], 404);
         }
+    }
+
+    public function deleteMultipleMonuments($ids)
+    {
+        $this->_monumentService->deleteMultipleMonuments($ids);
+    
+        return response()->json(['message' => 'Multiple monuments deleted successfully']);
+        if ($result) {
+            return response()->json(['message' => 'Monument deleted successfully']);
+        } else {
+            return response()->json(['message' => 'Monument not found'], 404);
+        }
+    }
+            
     }
 }
 
