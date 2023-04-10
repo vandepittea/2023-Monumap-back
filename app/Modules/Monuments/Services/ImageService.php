@@ -29,11 +29,7 @@ class ImageService extends Service
                     'monument_id' => $monument->id
                 ];
 
-                $this->validate($imagesData);
-
-                if ($this->hasErrors()) {
-                    throw new ValidationException($validator);
-                }
+                $this->checkValidation($imagesData);
             }
             
             $monument->images()->createMany($imagesData);

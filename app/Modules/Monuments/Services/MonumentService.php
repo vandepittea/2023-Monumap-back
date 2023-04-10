@@ -10,11 +10,12 @@ use App\Modules\Monuments\Services\AudiovisualSourceService;
 use App\Modules\Monuments\Services\ImageService;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use App\Exceptions\MonumentAlreadyExistsException;
+use App\Exceptions\NotFoundException;
 
 class MonumentService extends Service
 {
         protected $_rules = [
-            'id' => 'required',
             'name' => 'required|string|max:50',
             'description' => 'required|string',
             'location' => 'required',
@@ -45,7 +46,7 @@ class MonumentService extends Service
             $this->_imageService = $imageService;
         }
 
-        public function getAllMonuments($pages = 10, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
+        public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
             $monuments = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images'])
                                        ->when($type, function ($query, $type) {
                                             return $query->ofType($type);
@@ -68,11 +69,9 @@ class MonumentService extends Service
 
         public function addMonument($data)
         {
-            $this->validate($data);
+            $this->checkValidation($data);
 
-            if ($this->hasErrors()) {
-                throw new ValidationException($validator);
-            }
+            $this->checkIfMonumentAlreadyExists($data['name']);
         
             DB::beginTransaction();
         
@@ -117,21 +116,16 @@ class MonumentService extends Service
         }
 
         public function getOneMonument($id){
-            return ["data" => $this->_model->with(['location', 'dimensions', 'images', 'audiovisualSource'])->find($id)];
+            $monument = $this->checkIfMonumentExists($id);
+
+            return ["data" => $monument->with(['location', 'dimensions', 'images', 'audiovisualSource'])];
         }
 
         public function updateMonument($id, $data)
         {
-            $this->validate($data);
+            $this->checkValidation($data);
 
-            if ($this->hasErrors()) {
-                throw new ValidationException($validator);
-            }
-
-            $monument = $this->_model->find($id);
-            if (!$monument) {
-                return;
-            }
+            checkIfMonumentExists($id);
 
             DB::beginTransaction();
 
@@ -169,7 +163,7 @@ class MonumentService extends Service
         } 
 
         public function deleteMonument($id) {
-            $monument = $this->_model->find($id);
+            $monument = checkIfMonumentExists($id);
 
             if($monument){
                 $monument->delete();
@@ -177,8 +171,14 @@ class MonumentService extends Service
         }
 
         public function deleteMultipleMonuments($ids) {
+            $monuments = $this->_model->whereIn('id', $ids)->get();
+        
+            if ($monuments->count() !== count($ids)) {
+                throw new NotFoundException('One or more monuments not found.');
+            }
+        
             $this->_model->destroy($ids);
-        }                  
+        }                          
         
         private function getMonumentData($data, $locationId)
         {
@@ -208,5 +208,21 @@ class MonumentService extends Service
         
         private function updateMonumentData($monument, $monumentData) {
             $monument->update($monumentData);
-        }   
+        }  
+        
+        private function checkIfMonumentExists($id){
+            $monument = $this->_model->find($id);
+            if (!$monument) {
+                throw new NotFoundException('Monument not found.');
+            }
+        
+            return $monument;
+        }
+
+        private function checkIfMonumentAlreadyExists($name){
+            $monument = this->_model->where('name', $name)->first();
+            if ($monument) {
+                throw new AlreadyExistsException('Monument already exists.');
+            }
+        }
 }

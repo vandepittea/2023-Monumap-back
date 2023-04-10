@@ -13,72 +13,84 @@ class MonumentApiController extends Controller
     }
 
     public function getAllMonuments(Request $request) {
-        $pages = $request->get("pages", 10); 
+        $pages = $request->get('pages', 10);
     
-        $parameter = $this->checkForQueryParameter($request);
+        $type = $request->query('type');
+        $year = $request->query('year');
+        $designer = $request->query('designer');
+        $cost = $request->query('cost');
+        $language = $request->query('language');
     
-        return $this->_service->getAllMonuments($pages, $parameter['name'], $parameter['value']);
+        return $this->_service->getAllMonuments($pages, $type, $year, $designer, $cost, $language);
     }
-    
-    private function checkForQueryParameter($request) {
-        $allowedParams = ['name', 'year', 'designer', 'cost', 'language']; 
-        $queryParameters = $request->query();
-        $result = [];
-    
-        foreach ($queryParameters as $key => $value) {
-            if (in_array($key, $allowedParams)) {
-                $result['name'] = $key;
-                $result['value'] = $value;
-                return $result;
-            }
+
+    public function addMonument(Request $request)
+    {    
+        try {
+            $data = $request->all();
+
+            $monument = $this->_service->addMonument($data);
+
+            return $monument;
+        } catch (MonumentAlreadyExistsException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getStatusCode());
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => $e->getErrors()
+            ], $e->getStatusCode());
         }
-        return null; 
-    }
+    }    
 
-    public function addMonument(Request $request){
-        $data = $request->all();
-        $monument = $this->_service->addMonument($data);
-
-        if($this->_service->hasErrors()){
-            return ["errors" => $this->_service->getErrors()];
+    public function getOneMonument($id) {
+        try {
+            return $this->_service->getOneMonument($id);
+        } catch (NotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getStatusCode());
         }
-        
-        return $monument;
-    }
-
-    public function getOneMonument($id){
-        if($this->_service->hasErrors()){
-            return ["errors" => $this->_service->getErrors()];
-        }
-
-        return $this->_service->getOneMonument($id);
-
-    }
+    }    
 
     public function updateMonument($id, Request $request){
-        $data = $request->all();
-        return $this->_service->updateMonument($id, $data);
+        try {
+            $data = $request->all();
+            $monument = $this->_service->updateMonument($id, $data);
+            
+            return $monument;
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => $e->getErrors()
+            ], $e->getStatusCode());
+        } catch (NotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getStatusCode());
+        }
     }
 
     public function deleteMonument($id){
-        $result = $this->_service->deleteMonument($id);
-        if ($result) {
-            return response()->json(['message' => 'Monument deleted successfully']);
-        } else {
-            return response()->json(['message' => 'Monument not found'], 404);
+        try {
+            $this->_service->deleteMonument($id);
+        } catch (NotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getStatusCode());
         }
     }
 
     public function deleteMultipleMonuments($ids)
     {
-        $result = $this->_service->deleteMultipleMonuments($ids);
-    
-        if ($result) {
-            return response()->json(['message' => 'Multiple monuments deleted successfully']);
-        } else {
-            return response()->json(['message' => 'Monuments not found'], 404);
+        try {
+            $this->_service->deleteMultipleMonuments($ids);
+        } catch (NotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], $e->getStatusCode());
         }
-    }
-            
+    }          
 }
 
