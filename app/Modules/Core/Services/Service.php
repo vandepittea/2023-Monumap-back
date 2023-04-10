@@ -17,7 +17,7 @@ class Service {
     public function __construct(Model $model)
     {
         $this->_model = $model;
-        $this->_errors = new MessageBag();
+        $this->_validationErrors = new MessageBag();
     }
 
     protected function checkValidation($data){

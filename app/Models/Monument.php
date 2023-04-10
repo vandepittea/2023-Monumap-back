@@ -25,6 +25,7 @@ class Monument extends Model
 
     protected $casts = [
         'used_materials' => 'array',
+        'accessibility' => 'array',
     ];
 
     protected $attributes = [

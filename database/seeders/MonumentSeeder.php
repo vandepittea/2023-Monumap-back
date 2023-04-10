@@ -53,8 +53,8 @@ class MonumentSeeder extends Seeder
                 'type' => $data['type'],
                 'year_of_construction' => $data['year_of_construction'],
                 'monument_designer' => $data['monument_designer'],
-                'accessibility' => $data['accessibility'],
-                'used_materials' => explode(',', $data['used_materials']),
+                'accessibility' => explode(",",$data['accessibility']),
+                'used_materials' => explode(",",$data['used_materials']),
                 'dimensions' => [
                     'height' => $data['height'],
                     'width' => $data['width'],
@@ -63,8 +63,8 @@ class MonumentSeeder extends Seeder
                 'weight' => $data['weight'] ?: null,
                 'cost_to_construct' => $data['cost_to_construct'] ?: null,
                 'images' => [
-                    'urls' => $data['images_urls'],
-                    'captions' => $data['images_captions'],
+                    'urls' => explode(",",$data['images_urls']),
+                    'captions' => explode(",",$data['images_captions']),
                 ],
                 'audiovisual_source' => [
                     'title' => $data['audiovisual_source_title'],

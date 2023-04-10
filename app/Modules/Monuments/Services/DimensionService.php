@@ -19,7 +19,7 @@ class DimensionService extends Service
 
         public function getOrCreateDimensions($dimensionsData, $monument)
         {
-            $this->checkValidation($dimensionData);
+            $this->checkValidation($dimensionsData);
         
             $dimensionData = [
                 'height' => $dimensionsData['height'],
@@ -32,13 +32,5 @@ class DimensionService extends Service
         
         public function deleteUnusedDimensions($oldDimensionsId) {
             $this->_model->where('id', $oldDimensionsId)->whereDoesntHave('monuments')->delete();
-        }
-
-        private function checkValidationOfDimension($data){
-            $this->validate($data);
-
-            if ($this->hasErrors()) {
-                throw new ValidationException($validator);
-            }
         }
 }

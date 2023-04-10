@@ -10,7 +10,7 @@ use App\Modules\Monuments\Services\AudiovisualSourceService;
 use App\Modules\Monuments\Services\ImageService;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use App\Exceptions\MonumentAlreadyExistsException;
+use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
 
 class MonumentService extends Service
@@ -30,7 +30,7 @@ class MonumentService extends Service
             'cost_to_construct' => 'nullable|numeric',
             'images' => 'required',
             'audiovisual_source' => 'nullable',
-            'languages' => 'required|string'
+            'language' => 'required|string'
         ];    
 
         private $_locationService;
@@ -220,7 +220,7 @@ class MonumentService extends Service
         }
 
         private function checkIfMonumentAlreadyExists($name){
-            $monument = this->_model->where('name', $name)->first();
+            $monument = $this->_model->where('name', $name)->first();
             if ($monument) {
                 throw new AlreadyExistsException('Monument already exists.');
             }
