@@ -10,11 +10,12 @@ use App\Modules\Monuments\Services\AudiovisualSourceService;
 use App\Modules\Monuments\Services\ImageService;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use App\Exceptions\MonumentAlreadyExistsException;
+use App\Exceptions\NotFoundException;
 
 class MonumentService extends Service
 {
         protected $_rules = [
-            'id' => 'required',
             'name' => 'required|string|max:50',
             'description' => 'required|string',
             'location' => 'required',
@@ -45,7 +46,7 @@ class MonumentService extends Service
             $this->_imageService = $imageService;
         }
 
-        public function getAllMonuments($pages = 10, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
+        public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
             $monuments = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images'])
                                        ->when($type, function ($query, $type) {
                                             return $query->ofType($type);
@@ -68,22 +69,25 @@ class MonumentService extends Service
 
         public function addMonument($data)
         {
-            $validation = $this->validate($data);
+            $this->checkValidation($data);
 
-            if ($validation->fails()) {
-                return $validation->errors();
-            }
+            $this->checkIfMonumentAlreadyExists($data['name']);
         
             DB::beginTransaction();
         
             try {
                 $location = $this->_locationService->getOrCreateLocation($data['location']);
-                $dimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions']);
-                $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source']);
         
-                $monumentData = $this->getMonumentData($data, $location->id, $dimensions->id, $audiovisualSource->id);
+                $monumentData = $this->getMonumentData($data, $location->id);
                 $monument = $this->createMonument($monumentData);
         
+                if (isset($data['dimensions'])) {
+                    $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                }
+                if (isset($data['audiovisual_source'])) {
+                    $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                }
+                
                 $this->_imageService->createImages($data['images']['urls'], $data['images']['captions'], $monument);
         
                 DB::commit();
@@ -112,21 +116,16 @@ class MonumentService extends Service
         }
 
         public function getOneMonument($id){
-            return ["data" => $this->_model->with(['location', 'dimensions', 'images', 'audiovisualSource'])->find($id)];
+            $monument = $this->checkIfMonumentExists($id);
+
+            return ["data" => $monument->with(['location', 'dimensions', 'images', 'audiovisualSource'])];
         }
 
         public function updateMonument($id, $data)
         {
-            $this->validate($data);
+            $this->checkValidation($data);
 
-            if ($this->hasErrors()) {
-                return;
-            }
-
-            $monument = $this->_model->find($id);
-            if (!$monument) {
-                return;
-            }
+            $monument = $this->checkIfMonumentExists($id); 
 
             DB::beginTransaction();
 
@@ -136,18 +135,23 @@ class MonumentService extends Service
                 $oldAudiovisualSourceId = $monument->audiovisual_source_id;
             
                 $newLocation = $this->_locationService->getOrCreateLocation($data['location']);
-                $newDimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions']);
-                $newAudiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source']);
             
                 $monumentData = $this->getMonumentData($data, $newLocation->id, $newDimensions->id, $newAudiovisualSource->id);
                 $this->updateMonumentData($monument, $monumentData);
-    
-                $this->_locationService->deleteUnusedLocations($oldLocationId);
-                $this->_dimensionService->deleteUnusedDimensions($oldDimensionsId);
-                $this->_audiovisualSourceService->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
+
+                if (isset($data['dimensions'])) {
+                    $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                }
+                if (isset($data['audiovisual_source'])) {
+                    $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                }
     
                 $this->_imageService->deleteImages($id);
                 $this->_imageService->createImages($data['images_url'], $data['images_caption'], $id);
+
+                $this->_locationService->deleteUnusedLocations($oldLocationId);
+                $this->_dimensionService->deleteUnusedDimensions($oldDimensionsId);
+                $this->_audiovisualSourceService->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
     
                 DB::commit();
 
@@ -159,7 +163,7 @@ class MonumentService extends Service
         } 
 
         public function deleteMonument($id) {
-            $monument = $this->_model->find($id);
+            $monument = $this->checkIfMonumentExists($id);
 
             if($monument){
                 $monument->delete();
@@ -167,10 +171,16 @@ class MonumentService extends Service
         }
 
         public function deleteMultipleMonuments($ids) {
-            $this->_model->destroy($ids);
-        }                  
+            $monuments = $this->_model->whereIn('id', $ids)->get();
         
-        private function getMonumentData($data, $locationId, $dimensionsId, $audiovisualSourceId)
+            if ($monuments->count() !== count($ids)) {
+                throw new NotFoundException('One or more monuments not found.');
+            }
+        
+            $this->_model->destroy($ids);
+        }                          
+        
+        private function getMonumentData($data, $locationId)
         {
             $monumentData = array_intersect_key($data, array_flip([
                 'name',
@@ -187,8 +197,6 @@ class MonumentService extends Service
             ]));
         
             $monumentData['location_id'] = $locationId;
-            $monumentData['dimensions_id'] = $dimensionsId;
-            $monumentData['audiovisual_source_id'] = $audiovisualSourceId;
         
             return $monumentData;
         }
@@ -200,5 +208,21 @@ class MonumentService extends Service
         
         private function updateMonumentData($monument, $monumentData) {
             $monument->update($monumentData);
-        }   
+        }  
+        
+        private function checkIfMonumentExists($id){
+            $monument = $this->_model->find($id);
+            if (!$monument) {
+                throw new NotFoundException('Monument not found.');
+            }
+        
+            return $monument;
+        }
+
+        private function checkIfMonumentAlreadyExists($name){
+            $monument = this->_model->where('name', $name)->first();
+            if ($monument) {
+                throw new AlreadyExistsException('Monument already exists.');
+            }
+        }
 }

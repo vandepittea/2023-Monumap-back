@@ -3,13 +3,14 @@ namespace App\Modules\Core\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\MessageBag;
 
 use App\Model\Monument;
 
 class Service {
     protected $_model;
-    protected $_errors;
+    protected $_validationErrors;
 
     protected $_rules = [];
 
@@ -19,23 +20,31 @@ class Service {
         $this->_errors = new MessageBag();
     }
 
-    protected function validate($data){
+    protected function checkValidation($data){
+        $validator = $this->validate($data);
+
+        if ($this->hasErrors()) {
+            throw new ValidationException($validator);
+        }
+    }
+
+    private function validate($data){
         $validator = Validator::make($data, $this->_rules);
+
         if($validator->fails()){
-            $this->_errors = $validator->errors();
+            $this->_validationErrors = $validator->errors();
         }
 
         return $validator;
     }
 
-    public function hasErrors(){
-        return $this->_errors->any();
+    private function hasErrors(){
+        return $this->_validationErrors->any();
     }
-
-    public function getErrors(){
-        return $this->_errors;
-    }
+<<<<<<< HEAD
 
     
 
+=======
+>>>>>>> 244b3db9d2a7264bf9feacbc3af18fdf43491eb1
 }
