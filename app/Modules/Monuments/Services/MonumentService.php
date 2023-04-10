@@ -3,15 +3,15 @@ namespace App\Modules\Monuments\Services;
 
 use App\Models\Monument;
 use App\Modules\Core\Services\Service;
-use App\Modules\Core\Services\ServiceLanguages;
 use App\Modules\Monuments\Services\LocationService;
 use App\Modules\Monuments\Services\DimensionService;
 use App\Modules\Monuments\Services\AudiovisualSourceService;
 use App\Modules\Monuments\Services\ImageService;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class MonumentService extends Service
 {
@@ -63,7 +63,8 @@ class MonumentService extends Service
                                        ->when($language, function ($query, $language) {
                                             return $query->ofLanguage($language);
                                         })
-                                       ->paginate($pages)->withQueryString();
+                                       ->paginate($pages)->appends(request()->query());
+
             return $monuments;
         }
 
@@ -125,7 +126,7 @@ class MonumentService extends Service
         {
             $this->checkValidation($data);
 
-            checkIfMonumentExists($id);
+            $monument = $this->checkIfMonumentExists($id);
 
             DB::beginTransaction();
 
@@ -136,7 +137,7 @@ class MonumentService extends Service
             
                 $newLocation = $this->_locationService->getOrCreateLocation($data['location']);
             
-                $monumentData = $this->getMonumentData($data, $newLocation->id, $newDimensions->id, $newAudiovisualSource->id);
+                $monumentData = $this->getMonumentData($data, $newLocation->id);
                 $this->updateMonumentData($monument, $monumentData);
 
                 if (isset($data['dimensions'])) {
@@ -163,7 +164,7 @@ class MonumentService extends Service
         } 
 
         public function deleteMonument($id) {
-            $monument = checkIfMonumentExists($id);
+            $monument = $this->checkIfMonumentExists($id);
 
             if($monument){
                 $monument->delete();

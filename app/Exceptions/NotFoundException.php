@@ -6,9 +6,11 @@ use Exception;
 
 class NotFoundException extends Exception
 {
+    protected $_status;
+
     public function __construct($message = 'The requested resource was not found.')
     {
         parent::__construct($message);
-        protected $statusCode = 404;
+        $this->_status = 404;
     }
 }
