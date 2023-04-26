@@ -4,9 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Modules\Monuments\Services\MonumentService;
+<<<<<<< HEAD
 use App\Exceptions\ValidationException;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\AlreadyExistsException;
+=======
+use App\Exceptions\AlreadyExistsException;
+use App\Exceptions\NotFoundException;
+use Illuminate\Validation\ValidationException;
+
+>>>>>>> 8f5a4acb8ce590580cd3dcff5b303d1cb4b9d4fe
 class MonumentApiController extends Controller
 {
     private $_service;
@@ -34,15 +41,15 @@ class MonumentApiController extends Controller
             $monument = $this->_service->addMonument($data);
 
             return $monument;
-        } catch (MonumentAlreadyExistsException $e) {
+        } catch (AlreadyExistsException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], $e->getStatusCode());
+            ], $e->getStatus());
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
-                'errors' => $e->getErrors()
-            ], $e->getStatusCode());
+                'errors' => $e->errors()
+            ], $e->status);
         }
     }    
 
@@ -52,7 +59,7 @@ class MonumentApiController extends Controller
         } catch (NotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], $e->getStatusCode());
+            ], $e->getStatus());
         }
     }    
 
@@ -60,17 +67,16 @@ class MonumentApiController extends Controller
         try {
             $data = $request->all();
             $monument = $this->_service->updateMonument($id, $data);
-            
             return $monument;
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
-                'errors' => $e->getErrors()
-            ], $e->getStatusCode());
+                'errors' => $e->errors()
+            ], $e->status);
         } catch (NotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], $e->getStatusCode());
+            ], $e->getStatus());
         }
     }
 
@@ -80,7 +86,7 @@ class MonumentApiController extends Controller
         } catch (NotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], $e->getStatusCode());
+            ], $e->getStatus());
         }
     }
 
@@ -91,7 +97,7 @@ class MonumentApiController extends Controller
         } catch (NotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ], $e->getStatusCode());
+            ], $e->getStatus());
         }
     }          
 }

@@ -10,7 +10,7 @@ class ImageService extends Service
         protected $_rules = [
             'images.*.url' => 'required|url',
             'images.*.caption' => 'required|string|max:50',
-            'monument_id' => 'required|numeric'
+            'images.*.monument_id' => 'required|numeric'
         ];    
 
         public function __construct(Image $model) {
@@ -18,14 +18,11 @@ class ImageService extends Service
         }  
 
         public function createImages($imagesUrl, $imagesCaption, $monument)
-        {
-            $images = json_decode($imagesUrl, true);
-            $captions = json_decode($imagesCaption, true);
-            
-            foreach ($images as $key => $image) {
+        {            
+            foreach ($imagesUrl as $key => $image) {
                 $imagesData[] = [
                     'url' => $image,
-                    'caption' => $captions[$key],
+                    'caption' => $imagesCaption[$key],
                     'monument_id' => $monument->id
                 ];
 

@@ -30,13 +30,12 @@ return new class extends Migration
             ]);
             $table->integer('year_of_construction');
             $table->string('monument_designer');
-            $table->enum('accessibility', [
-                'wheelchair-friendly',
-                'near parking areas',
-                'low-slope ramps',
-                'power-assisted doors',
-                'elevators, accessible washrooms'
-            ])->nullable();
+            $table->json('accessibility')->nullable()->check(
+            'wheelchair-friendly',
+            'near parking areas',
+            'low-slope ramps',
+            'power-assisted doors',
+            'elevators, accessible washrooms');
             $table->json('used_materials')->nullable();
             $table->foreignId('dimensions_id')->nullable()->constrained('dimensions')->onDelete('cascade');
             $table->integer('weight')->nullable();

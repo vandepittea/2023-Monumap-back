@@ -3,15 +3,15 @@ namespace App\Modules\Monuments\Services;
 
 use App\Models\Monument;
 use App\Modules\Core\Services\Service;
-use App\Modules\Core\Services\ServiceLanguages;
 use App\Modules\Monuments\Services\LocationService;
 use App\Modules\Monuments\Services\DimensionService;
 use App\Modules\Monuments\Services\AudiovisualSourceService;
 use App\Modules\Monuments\Services\ImageService;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use App\Exceptions\MonumentAlreadyExistsException;
+use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class MonumentService extends Service
 {
@@ -30,7 +30,7 @@ class MonumentService extends Service
             'cost_to_construct' => 'nullable|numeric',
             'images' => 'required',
             'audiovisual_source' => 'nullable',
-            'languages' => 'required|string'
+            'language' => 'required|string'
         ];    
 
         private $_locationService;
@@ -63,7 +63,8 @@ class MonumentService extends Service
                                        ->when($language, function ($query, $language) {
                                             return $query->ofLanguage($language);
                                         })
-                                       ->paginate($pages)->withQueryString();
+                                       ->paginate($pages)->appends(request()->query());
+
             return $monuments;
         }
 
@@ -125,7 +126,11 @@ class MonumentService extends Service
         {
             $this->checkValidation($data);
 
+<<<<<<< HEAD
             $monument = $this->checkIfMonumentExists($id); 
+=======
+            $monument = $this->checkIfMonumentExists($id);
+>>>>>>> 8f5a4acb8ce590580cd3dcff5b303d1cb4b9d4fe
 
             DB::beginTransaction();
 
@@ -136,7 +141,7 @@ class MonumentService extends Service
             
                 $newLocation = $this->_locationService->getOrCreateLocation($data['location']);
             
-                $monumentData = $this->getMonumentData($data, $newLocation->id, $newDimensions->id, $newAudiovisualSource->id);
+                $monumentData = $this->getMonumentData($data, $newLocation->id);
                 $this->updateMonumentData($monument, $monumentData);
 
                 if (isset($data['dimensions'])) {
@@ -220,7 +225,7 @@ class MonumentService extends Service
         }
 
         private function checkIfMonumentAlreadyExists($name){
-            $monument = this->_model->where('name', $name)->first();
+            $monument = $this->_model->where('name', $name)->first();
             if ($monument) {
                 throw new AlreadyExistsException('Monument already exists.');
             }
