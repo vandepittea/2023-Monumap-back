@@ -41,10 +41,4 @@ class Service {
     private function hasErrors(){
         return $this->_validationErrors->any();
     }
-<<<<<<< HEAD
-
-    
-
-=======
->>>>>>> 244b3db9d2a7264bf9feacbc3af18fdf43491eb1
 }

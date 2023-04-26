@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Modules\Monuments\Services\MonumentService;
+use App\Exceptions\ValidationException;
+use App\Exceptions\NotFoundException;
 use App\Exceptions\AlreadyExistsException;
-
 class MonumentApiController extends Controller
 {
     private $_service;
@@ -33,7 +34,7 @@ class MonumentApiController extends Controller
             $monument = $this->_service->addMonument($data);
 
             return $monument;
-        } catch (MOnumentAlreadyExists $e) {
+        } catch (MonumentAlreadyExistsException $e) {
             return response()->json([
                 'message' => $e->getMessage()
             ], $e->getStatusCode());
