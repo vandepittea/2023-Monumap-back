@@ -11,16 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('images')) {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('monument_id');
             $table->string('url');
             $table->string('caption');
             $table->timestamps();
-
             $table->foreign('monument_id')->references('id')->on('monuments')->onDelete('cascade');
         });
     }
+}
 
     /**
      * Reverse the migrations.

@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('dimensions')) {
         Schema::create('dimensions', function (Blueprint $table) {
             $table->id();
             $table->double('height');
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->double('depth')->nullable();
             $table->timestamps();
         });
+    }
     }
 
     /**

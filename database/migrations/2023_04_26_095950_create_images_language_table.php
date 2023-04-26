@@ -11,18 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('audiovisual_sources')) {
-        Schema::create('audiovisual_sources', function (Blueprint $table) {
+        Schema::table('images', function(Blueprint $table) {
+            $table->dropColumn(['caption']);
+        });
+
+        Schema::create('images_language', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('url');
-            $table->enum('type', [
-                'audio',
-                'video'
-            ]);
+            $table->integer("image_id");
+            $table->string('caption');
             $table->timestamps();
         });
-    }
     }
 
     /**
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('audiovisual_sources');
+        Schema::dropIfExists('images_language');
     }
 };
