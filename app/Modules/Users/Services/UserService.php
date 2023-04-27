@@ -19,6 +19,12 @@ class UserService extends Service
         'password' => 'required|string|min:6',
     ];
 
+    private array $credentailRules = [
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ];
+    
+
     public function registerUser($data)
     {
         $validator = $this->validate($data);
@@ -33,6 +39,15 @@ class UserService extends Service
     
         return $user ? true : false;
     }
+
+    function login($data) : bool {
+        $validator = Validator::make($data, $this->credentailRules);
+        if ($validator->fails()) return false;
+    
+        $credentials = $data->only('email', 'password');
+        return auth()->attempt($credentials);
+    }
+    
     
     
     

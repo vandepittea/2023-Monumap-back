@@ -26,4 +26,14 @@ class AuthController extends Controller
         return response()->noContent();
     }
 
+    public function login(Request $request)
+    {
+        $data = $request->only('email', 'password');
+        if (!$this->userService->login($data)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
+        }
+
+        return response()->json(['message' => 'Logged in successfully'], 200);
+    }
+
 }
