@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::table('audiovisual_sources', function(Blueprint $table) {
+            $table->dropColumn(['title']);
+        });
+
         Schema::create('audiovisual_sources_language', function (Blueprint $table) {
             $table->id();
             $table->integer("source_id");

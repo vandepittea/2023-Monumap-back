@@ -50,10 +50,12 @@ return new class extends Migration
                         'near parking areas',
                         'low-slope ramps',
                         'power-assisted doors',
-                        'elevators, accessible washrooms',
+                        'elevators', 
+                        'accessible washrooms',
                         'rolstoelvriendelijk',
                         'dichtbij parkeerplaatsen',
                         'hellingen met lage helling',
+                        'elektrisch bediende deuren',
                         'liften, toegankelijke toiletten',
                     ])->nullable();
             $table->json('used_materials')->nullable();

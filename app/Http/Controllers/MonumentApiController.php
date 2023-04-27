@@ -4,16 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Modules\Monuments\Services\MonumentService;
-<<<<<<< HEAD
-use App\Exceptions\ValidationException;
-use App\Exceptions\NotFoundException;
-use App\Exceptions\AlreadyExistsException;
-=======
 use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
 use Illuminate\Validation\ValidationException;
 
->>>>>>> 8f5a4acb8ce590580cd3dcff5b303d1cb4b9d4fe
 class MonumentApiController extends Controller
 {
     private $_service;

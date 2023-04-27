@@ -10,28 +10,32 @@ use App\Modules\Monuments\Services\ImageService;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
+use App\Modules\Core\Services\ServiceLanguages;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class MonumentService extends Service
+class MonumentService extends ServiceLanguages
 {
         protected $_rules = [
-            'name' => 'required|string|max:50',
-            'description' => 'required|string',
             'location' => 'required',
             'historical_significance' => 'nullable|string',
-            'type' => 'required|string|in:War Memorials,Statues and Sculptures,Historical Buildings and Sites,National Monuments,Archaeological Sites,Cultural and Religious Monuments,Public Art Installations,Memorials for Historical Events,Natural Monuments,Tombs and Mausoleums',
             'year_of_construction' => 'required|integer|max:2023',
             'monument_designer' => 'required|string|max:50',
-            'accessibility' => 'nullable|array|in:wheelchair-friendly,near parking areas,low-slope ramps,power-assisted doors,elevators,accessible washrooms',
-            'used_materials' => 'nullable|array',
             'dimensions' => 'nullable',
             'weight' => 'nullable|numeric',
             'cost_to_construct' => 'nullable|numeric',
             'images' => 'required',
             'audiovisual_source' => 'nullable',
-            'language' => 'required|string'
         ];    
+
+        protected $_rulesTranslations = [
+            'name' => 'required|string|max:50',
+            'description' => 'required|string',
+            'type' => 'required|string|in:War Memorials,Statues and Sculptures,Historical Buildings and Sites,National Monuments,Archaeological Sites,Cultural and Religious Monuments,Public Art Installations,Memorials for Historical Events,Natural Monuments,Tombs and Mausoleums','Oorlogsmonumenten','Beelden en sculpturen','Historische gebouwen en plaatsen','Nationale Monumenten','Archeologische sites','Culturele en religieuze monumenten','Openbare Kunstinstallaties','Herdenkingen voor historische gebeurtenissen','Natuurmonumenten,Graven en Mausolea',
+            'accessibility' => 'nullable|array|in:wheelchair-friendly,near parking areas,low-slope ramps,power-assisted doors,elevators,accessible washrooms','rolstoelvriendelijk','dichtbij parkeerplaatsen','hellingen met lage helling','elektrisch bediende deuren','liften', 'toegankelijke toiletten',
+            'used_materials' => 'nullable|array',
+            'language' => 'required|string'
+        ];
 
         private $_locationService;
         private $_dimensionService;
@@ -48,6 +52,7 @@ class MonumentService extends Service
 
         public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
             $monuments = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images'])
+                                        ->with('translation')
                                        ->when($type, function ($query, $type) {
                                             return $query->ofType($type);
                                         })
@@ -64,6 +69,8 @@ class MonumentService extends Service
                                             return $query->ofLanguage($language);
                                         })
                                        ->paginate($pages)->appends(request()->query());
+
+            $monuments = $this->presentAllWithTranslations($monuments->toArray());
 
             return $monuments;
         }
@@ -126,11 +133,7 @@ class MonumentService extends Service
         {
             $this->checkValidation($data);
 
-<<<<<<< HEAD
-            $monument = $this->checkIfMonumentExists($id); 
-=======
             $monument = $this->checkIfMonumentExists($id);
->>>>>>> 8f5a4acb8ce590580cd3dcff5b303d1cb4b9d4fe
 
             DB::beginTransaction();
 
