@@ -51,8 +51,7 @@ class MonumentService extends ServiceLanguages
         }
 
         public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
-            $monuments = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images'])
-                                        ->with('translation')
+            $monuments = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images',]) //'translation'
                                        ->when($type, function ($query, $type) {
                                             return $query->ofType($type);
                                         })
@@ -70,7 +69,7 @@ class MonumentService extends ServiceLanguages
                                         })
                                        ->paginate($pages)->appends(request()->query());
 
-            $monuments = $this->presentAllWithTranslations($monuments->toArray());
+            //$monuments = $this->presentAllWithTranslations($monuments->toArray());
 
             return $monuments;
         }
