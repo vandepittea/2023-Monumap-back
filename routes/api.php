@@ -14,17 +14,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+/*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});*/
+
+Route::middleware('auth:api')->group(function() {
+    Route::post('/monuments', [MonumentApiController::class, 'addMonument']);
+    Route::put('monuments/{id}', [MonumentController::class, 'updateMonument']);
+
 });
 
 Route::get('/monuments', [MonumentApiController::class, 'getAllMonuments']);
 
-Route::post('/monuments', [MonumentApiController::class, 'addMonument']);
-
 Route::get('/monuments/{id}', [MonumentApiController::class, 'getOneMonument']);
-
-Route::put('monuments/{id}', [MonumentController::class, 'updateMonument']);
 
 Route::delete('monuments/{id}', [MonumentController::class], 'deleteMonument');
 
