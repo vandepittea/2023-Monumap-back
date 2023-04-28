@@ -40,13 +40,15 @@ class UserService extends Service
         return $user ? true : false;
     }
 
-    function login($data) : bool {
+    function login($data) : ?string {
         $validator = Validator::make($data, $this->credentailRules);
-        if ($validator->fails()) return false;
+        if ($validator->fails()) return null;
     
         $credentials = $data->only('email', 'password');
-        return auth()->attempt($credentials);
+        $token = auth()->attempt($credentials);
+        return $token;
     }
+    
     
     
     
