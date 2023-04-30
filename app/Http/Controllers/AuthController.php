@@ -34,13 +34,20 @@ class AuthController extends Controller
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'authorization' => [
-                'token' => $token,
-                'type' => 'bearer'
-            ]
-        ], 200);
+        return response([
+            "status" => "success"
+        ], 200)->withCookie(
+            'token',
+            $token,
+            config('jwt.ttl'),
+            '/',
+            null,
+            true,
+            true,
+            false,
+            "None"
+        );
+        
     }
 
 }
