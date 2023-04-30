@@ -13,4 +13,9 @@ class NotFoundException extends Exception
         parent::__construct($message);
         $this->_status = 404;
     }
+
+    public function getStatus()
+    {
+        return $this->_status;
+    }
 }

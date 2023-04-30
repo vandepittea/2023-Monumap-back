@@ -51,25 +51,25 @@ class MonumentService extends ServiceLanguages
         }
 
         public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
-            $monuments = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images',]) //'translation'
-                                       ->when($type, function ($query, $type) {
-                                            return $query->ofType($type);
-                                        })
-                                       ->when($year, function ($query, $year) {
-                                            return $query->ofOfYearOfConstruction($year);
-                                        })
-                                       ->when($designer, function ($query, $designer) {
-                                            return $query->OfMonumentDesigner($designer);
-                                        })
-                                       ->when($cost, function ($query, $cost) {
-                                            return $query->ofOfCostToConstruct($cost);
-                                        })
-                                       ->when($language, function ($query, $language) {
-                                            return $query->ofLanguage($language);
-                                        })
-                                       ->paginate($pages)->appends(request()->query());
+            $paginator = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images', 'translationsMonument', 'translationsSource', 'translationsImage'])
+            ->when($type, function ($query, $type) {
+                return $query->ofType($type);
+            })
+            ->when($year, function ($query, $year) {
+                return $query->ofOfYearOfConstruction($year);
+            })
+            ->when($designer, function ($query, $designer) {
+                return $query->OfMonumentDesigner($designer);
+            })
+            ->when($cost, function ($query, $cost) {
+                return $query->ofOfCostToConstruct($cost);
+            })
+            ->when($language, function ($query, $language) {
+                return $query->ofLanguage($language);
+            })
+            ->paginate($pages)->appends(request()->query());
 
-            //$monuments = $this->presentAllWithTranslations($monuments->toArray());
+            $monuments = $this->presentAllWithTranslations($paginator->items());
 
             return $monuments;
         }
@@ -125,7 +125,7 @@ class MonumentService extends ServiceLanguages
         public function getOneMonument($id){
             $monument = $this->checkIfMonumentExists($id);
 
-            return ["data" => $monument->with(['location', 'dimensions', 'images', 'audiovisualSource'])];
+            return ["data" => $monument->with(['location', 'dimensions', 'images', 'audiovisualSource','translationsMonument', 'translationsSource', 'translationsImage'])];
         }
 
         public function updateMonument($id, $data)
@@ -187,7 +187,7 @@ class MonumentService extends ServiceLanguages
             $this->_model->destroy($ids);
         }                          
         
-        private function getMonumentData($data, $locationId)
+        private function getMonumentData($data, $locationId) //TODO: hier ook met translation werken? 
         {
             $monumentData = array_intersect_key($data, array_flip([
                 'name',

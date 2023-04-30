@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Monument extends Model
 {
-
-    //TODO: translations
     use HasFactory;
 
     protected $fillable = [

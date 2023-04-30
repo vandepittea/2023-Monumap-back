@@ -17,7 +17,6 @@ class MonumentApiController extends Controller
 
     public function getAllMonuments(Request $request) {
         $pages = $request->get('pages', 10);
-    
         $type = $request->query('type');
         $year = $request->query('year');
         $designer = $request->query('designer');

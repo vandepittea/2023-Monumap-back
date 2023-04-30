@@ -28,7 +28,7 @@ class Service {
         }
     }
 
-    private function validate($data){
+    protected function validate($data){
         $validator = Validator::make($data, $this->_rules);
 
         if($validator->fails()){
