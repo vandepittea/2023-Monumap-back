@@ -13,6 +13,10 @@ class ImageService extends Service
             'images.*.monument_id' => 'required|numeric'
         ];    
 
+        protected $_rulesTranslations = [
+            'images.*.caption' => 'required|string|max:50',
+        ];    
+
         public function __construct(Image $model) {
             Parent::__construct($model);
         }  

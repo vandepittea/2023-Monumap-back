@@ -13,11 +13,15 @@ class AudioVisualSourceService extends Service
             'type' => 'required|string|in:audio,video',
         ];    
 
+        protected $_rulesTranslations = [
+            'title' => 'required|string',
+        ];  
+
         public function __construct(AudiovisualSource $model) {
             Parent::__construct($model);
         }  
         
-        public function getOrCreateAudiovisualSource($audiovisualSourceData, $monument)
+        public function getOrCreateAudiovisualSource($audiovisualSourceData, $monument) //TODO: hier ook translation toepassen?
         {
             $this->checkValidation($audiovisualSourceData);
 
