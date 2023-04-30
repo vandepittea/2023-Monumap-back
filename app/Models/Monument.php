@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Monument extends Model
 {
+
+    //TODO: translations
     use HasFactory;
 
     protected $fillable = [
@@ -71,5 +73,17 @@ class Monument extends Model
     
     public function scopeOfLanguage($query, $language) {
         return $query->where('language', $language);
+    }
+
+    public function translationsMonument(){
+        return $this->hasMany(MonumentLanguage::class, 'monument_id', 'id');
+    }
+
+    public function translationsSource(){
+        return $this->hasMany(SourceLanguage::class, 'source_id', 'id');
+    }
+
+    public function translationsImage(){
+        return $this->hasMany(SourceLanguage::class, 'image_id', 'id');
     }
 }

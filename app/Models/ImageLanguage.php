@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ModelSourceLanguage extends Model
+class ImageLanguage extends Model
 {
     use HasFactory;
 }
