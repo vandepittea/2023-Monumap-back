@@ -56,8 +56,10 @@ class MonumentService extends ServiceLanguages
             $query = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images', 'translationsMonument', 'translationsSource', 'translationsImage']);
 
             if ($type) {
-                $query->OfType($type);
-            }
+                $query->whereHas('translationsMonument', function ($query) use ($type) {
+                    $query->where('type', $type);
+                });
+            }    
 
             if ($year) {
                 $query->OfYearOfConstruction($year);
@@ -71,9 +73,9 @@ class MonumentService extends ServiceLanguages
                 $query->OfCostToConstruct($cost);
             }
 
-            if ($language) {
+           /* if ($language) { //TODO: wegdoen
                 $query->OfLanguage($language);
-            }
+            }*/
 
             $paginator = $query->paginate($pages)->appends(request()->query());
 
