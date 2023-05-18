@@ -7,6 +7,7 @@ use App\Modules\Monuments\Services\MonumentService;
 use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 
 class MonumentApiController extends Controller
 {

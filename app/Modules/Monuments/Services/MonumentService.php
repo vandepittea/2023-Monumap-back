@@ -13,7 +13,7 @@ use App\Exceptions\NotFoundException;
 use App\Modules\Core\Services\ServiceLanguages;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log; //TODO: remove
+use Illuminate\Support\Facades\Log;
 
 class MonumentService extends ServiceLanguages
 {
@@ -51,24 +51,31 @@ class MonumentService extends ServiceLanguages
             $this->_imageService = $imageService;
         }
 
-        public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null) {
-            $paginator = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images', 'translationsMonument', 'translationsSource', 'translationsImage'])
-            ->when($type, function ($query, $type) {
-                return $query->ofType($type);
-            })
-            ->when($year, function ($query, $year) {
-                return $query->ofOfYearOfConstruction($year);
-            })
-            ->when($designer, function ($query, $designer) {
-                return $query->OfMonumentDesigner($designer);
-            })
-            ->when($cost, function ($query, $cost) {
-                return $query->ofOfCostToConstruct($cost);
-            })
-            ->when($language, function ($query, $language) {
-                return $query->ofLanguage($language);
-            })
-            ->paginate($pages)->appends(request()->query());
+        public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null)
+        {
+            $query = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images', 'translationsMonument', 'translationsSource', 'translationsImage']);
+
+            if ($type) {
+                $query->OfType($type);
+            }
+
+            if ($year) {
+                $query->OfYearOfConstruction($year);
+            }
+
+            if ($designer) {
+                $query->OfMonumentDesigner($designer);
+            }
+
+            if ($cost) {
+                $query->OfCostToConstruct($cost);
+            }
+
+            if ($language) {
+                $query->OfLanguage($language);
+            }
+
+            $paginator = $query->paginate($pages)->appends(request()->query());
 
             $monuments = $this->presentAllWithTranslations($paginator->items());
 

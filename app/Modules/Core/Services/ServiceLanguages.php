@@ -54,7 +54,6 @@ abstract class ServiceLanguages extends Service
       /* foreach ($data["data"] as $record) { //TODO: terugzetten
        $data["data"] = $this->presentFindWithTranslations($record);
         }*/
-       Log::info($data);
         return $data;
     }
 

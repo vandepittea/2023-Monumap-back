@@ -58,7 +58,7 @@ class Monument extends Model
     }
 
     public function scopeOfYearOfConstruction($query, $year) {
-        return $query->whereYear('year_of_construction', $year);
+        return $query->where('year_of_construction', $year);
     }
     
     public function scopeOfMonumentDesigner($query, $designer) {
@@ -84,4 +84,5 @@ class Monument extends Model
     public function translationsImage(){
         return $this->hasMany(ImageLanguage::class, 'image_id', 'id');
     }
+
 }

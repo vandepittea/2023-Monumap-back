@@ -20,7 +20,6 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-            Log::info('in try registerin user ----------------'); //TODO: remove
             $this->userService->registerUser($request->all());
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
