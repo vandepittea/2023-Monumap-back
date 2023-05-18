@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Modules\Users\Services\UserService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class AuthController extends Controller
 {
@@ -18,6 +20,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
+            Log::info('in try registerin user ----------------'); //TODO: remove
             $this->userService->registerUser($request->all());
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

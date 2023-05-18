@@ -92,6 +92,5 @@ class MonumentApiController extends Controller
                 'message' => $e->getMessage()
             ], $e->getStatus());
         }
-    }          
+    }      
 }
-

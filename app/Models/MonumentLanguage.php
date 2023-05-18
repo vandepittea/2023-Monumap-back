@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class MonumentLanguage extends Model
 {
     use HasFactory;
+    protected $table = "monument_language";
 
     public function monument()
     {
-        return $this->belongsTo(Monument::class);
+        return $this->belongsTo(Monument::class, "monument_id", "id");
     }
 }

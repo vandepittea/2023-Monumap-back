@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MonumentApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,9 +21,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->group(function() {
     Route::post('/monuments', [MonumentApiController::class, 'addMonument']);
-    Route::put('monuments/{id}', [MonumentController::class, 'updateMonument']);
-    Route::delete('monuments/{id}', [MonumentController::class], 'deleteMonument');
-    Route::delete('monuments/{ids}', [MonumentController::class], 'deleteMultipleMonuments');
+    Route::put('monuments/{id}', [MonumentApiController::class, 'updateMonument']);
+    Route::delete('monuments/{id}', [MonumentApiController::class], 'deleteMonument');
+    Route::delete('monuments/{ids}', [MonumentApiController::class], 'deleteMultipleMonuments');
 });
 
 Route::get('/monuments', [MonumentApiController::class, 'getAllMonuments']);

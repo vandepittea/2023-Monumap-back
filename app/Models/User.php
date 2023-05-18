@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable //implements JWTSubject //TODO: deze wegdoen?
 {
     use HasFactory, Notifiable;
 
@@ -16,8 +16,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'username',
         'password',
     ];
 
@@ -34,11 +33,11 @@ class User extends Authenticatable implements JWTSubject
     /**
      * The attributes that should be cast.
      *
-     * @var array<string, string>
+     * @var array<string, string> //TODO: deze wegdoen?
      */
-    protected $casts = [
+    /*protected $casts = [
         'email_verified_at' => 'datetime',
-    ];
+    ];*/
 
      /**
      * Get the identifier that will be stored in the subject claim of the JWT.
