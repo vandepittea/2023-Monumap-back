@@ -10,14 +10,15 @@ use App\Model\Monument;
 
 class Service {
     protected $_model;
-    protected $_validationErrors;
+    protected $_errors;
+//    protected $_validationErrors; //TODO: remove
 
     protected $_rules = [];
 
     public function __construct(Model $model)
     {
         $this->_model = $model;
-        $this->_validationErrors = new MessageBag();
+        $this->_errors = new MessageBag();
     }
 
     protected function checkValidation($data){
@@ -32,13 +33,19 @@ class Service {
         $validator = Validator::make($data, $this->_rules);
 
         if($validator->fails()){
-            $this->_validationErrors = $validator->errors();
+            $this->_errors = $validator->errors();
+
         }
 
         return $validator;
     }
 
     private function hasErrors(){
-        return $this->_validationErrors->any();
+        return $this->_errors->any();
     }
+
+    public function getErrors(){
+        return $this->_errors;
+    }
+
 }

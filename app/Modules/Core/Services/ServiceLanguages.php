@@ -4,6 +4,7 @@ namespace App\Modules\Core\Services;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Log; //TODO: remove
 
 abstract class ServiceLanguages extends Service
 {
@@ -50,9 +51,10 @@ abstract class ServiceLanguages extends Service
     // -- PRESENTERS --> REFACTOR --
     protected function presentAllWithTranslations($data)
     {
-        foreach ($data["data"] as $record) {
-            $data["data"] = $this->presentFindWithTranslations($record);
+       foreach ($data["data"] as $record) { //TODO: terugzetten
+       $data["data"] = $this->presentFindWithTranslations($record);
         }
+       Log::info($data);
         return $data;
     }
 
