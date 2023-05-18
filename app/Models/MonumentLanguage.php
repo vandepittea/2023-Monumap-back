@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class MonumentLanguage extends Model
 {
     use HasFactory;
-    protected $table = "monument_language";
+    protected $table = "monuments_language";
 
     public function monument()
     {

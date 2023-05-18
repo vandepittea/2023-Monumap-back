@@ -38,7 +38,7 @@ class Monument extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function dimension()
+    public function dimensions()
     {
         return $this->belongsTo(Dimension::class);
     }
@@ -78,10 +78,10 @@ class Monument extends Model
     }
 
     public function translationsSource(){
-        return $this->hasMany(SourceLanguage::class, 'source_id', 'id');
+        return $this->hasMany(AudioSourceLanguage::class, 'source_id', 'id');
     }
 
     public function translationsImage(){
-        return $this->hasMany(SourceLanguage::class, 'image_id', 'id');
+        return $this->hasMany(ImageLanguage::class, 'image_id', 'id');
     }
 }

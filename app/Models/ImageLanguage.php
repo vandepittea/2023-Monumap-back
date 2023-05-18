@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class ImageLanguage extends Model
 {
     use HasFactory;
+    protected $table = "images_language";
 }

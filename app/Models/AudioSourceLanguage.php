@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SourceLanguage extends Model
+class AudioSourceLanguage extends Model
 {
     use HasFactory;
+    protected $table = "audiovisual_sources_language";
 }
