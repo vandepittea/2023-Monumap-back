@@ -13,6 +13,7 @@ use App\Exceptions\NotFoundException;
 use App\Modules\Core\Services\ServiceLanguages;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log; //TODO: remove
 
 class MonumentService extends ServiceLanguages
 {
@@ -124,8 +125,9 @@ class MonumentService extends ServiceLanguages
 
         public function getOneMonument($id){
             $monument = $this->checkIfMonumentExists($id);
-
-            return ["data" => $monument->with(['location', 'dimensions', 'images', 'audiovisualSource','translationsMonument', 'translationsSource', 'translationsImage'])];
+            
+            $monument->load(['location', 'dimensions', 'images', 'audiovisualSource', 'translationsMonument', 'translationsSource', 'translationsImage']);
+            return ["data" => $monument];
         }
 
         public function updateMonument($id, $data)
@@ -219,6 +221,7 @@ class MonumentService extends ServiceLanguages
         
         private function checkIfMonumentExists($id){
             $monument = $this->_model->find($id);
+
             if (!$monument) {
                 throw new NotFoundException('Monument not found.');
             }
