@@ -2,7 +2,6 @@
 namespace App\Modules\Monuments\Services;
 
 use App\Modules\Core\Services\Service;
-use Illuminate\Validation\Rule;
 use App\Models\Location;
 
 class LocationService extends Service
