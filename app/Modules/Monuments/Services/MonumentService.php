@@ -64,7 +64,7 @@ class MonumentService extends ServiceLanguages
             if ($year) {
                 $query->OfYearOfConstruction($year);
             }
-
+            
             if ($designer) {
                 $query->OfMonumentDesigner($designer);
             }
@@ -198,7 +198,7 @@ class MonumentService extends ServiceLanguages
             $this->_model->destroy($ids);
         }                          
         
-        private function getMonumentData($data, $locationId) //TODO: hier ook met translation werken? 
+        private function getMonumentData($data, $locationId)  
         {
             $monumentData = array_intersect_key($data, array_flip([
                 'name',

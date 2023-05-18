@@ -42,10 +42,14 @@ class UserService extends Service
 
     function login($data) : ?string { //TODO: is dit Correct?
         $validator = Validator::make($data, $this->credentialRules);
-
+        Log::info($data);
         if ($validator->fails()) return null;
     
         $credentials = $data->only('username', 'password');
+     //   $credentials['password'] = Hash::make($credentials['password']);
+
+         Log::info($credentials);
+
     
         $token = auth()->attempt($credentials);
         return $token;
