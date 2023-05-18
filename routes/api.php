@@ -17,20 +17,17 @@ use Illuminate\Support\Facades\Route;
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });*/
-//TODO: Delete hier ook in? 
 
 Route::middleware('auth:api')->group(function() {
     Route::post('/monuments', [MonumentApiController::class, 'addMonument']);
     Route::put('monuments/{id}', [MonumentController::class, 'updateMonument']);
+    Route::delete('monuments/{id}', [MonumentController::class], 'deleteMonument');
+    Route::delete('monuments/{ids}', [MonumentController::class], 'deleteMultipleMonuments');
 });
 
 Route::get('/monuments', [MonumentApiController::class, 'getAllMonuments']);
 
 Route::get('/monuments/{id}', [MonumentApiController::class, 'getOneMonument']);
-
-Route::delete('monuments/{id}', [MonumentController::class], 'deleteMonument');
-
-Route::delete('monuments/{ids}', [MonumentController::class], 'deleteMultipleMonuments');
 
 Route::post('monuments/register', [AuthController::class, 'register']);
 

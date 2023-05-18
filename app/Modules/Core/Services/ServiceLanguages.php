@@ -14,7 +14,6 @@ abstract class ServiceLanguages extends Service
     // -- VALIDATOR --> REFACTOR --
     protected function validate($data)
     {   
-        
         $translationData = isset($data["translations"]) ? $data["translations"] : null;        
         unset($data["translations"]);
 
@@ -27,7 +26,6 @@ abstract class ServiceLanguages extends Service
 
     private function validateData($data, $rules = null)
     {
-
         if ($rules == null)
             $rules = $this->_rules;
 
@@ -40,7 +38,6 @@ abstract class ServiceLanguages extends Service
     }
     private function validateDataTranslations($data)
     {
-        
         foreach ($data as $translation) {
             $this->validateDataTranslation($translation);
         }
