@@ -93,11 +93,15 @@ class MonumentService extends Service
                 $monument = $this->createMonument($monumentData);
         
                 if (isset($data['dimensions'])) {
-                    $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    //$this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    $dimension = $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    Log::info($dimension);
+                    $monument->dimensions()->associate($dimension);//TODO: werkt niet, hier update gebruiken, maar niet volledige data...
                     
                 }
                 if (isset($data['audiovisual_source'])) {
-                    $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                    $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                    $monument->audiovisualSource()->associate($audiovisualSource); //TODO: werkt niet, hier update gebruiken, maar niet volledige data...
                 }
 
                 if (isset($data['monuments_language'])){

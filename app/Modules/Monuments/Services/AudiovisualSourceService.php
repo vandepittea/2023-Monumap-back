@@ -4,6 +4,7 @@ namespace App\Modules\Monuments\Services;
 use App\Modules\Core\Services\Service;
 use Illuminate\Validation\Rule;
 use App\Models\AudiovisualSource;
+use Illuminate\Support\Facades\Log;
 
 class AudioVisualSourceService extends Service
 {
@@ -31,11 +32,11 @@ class AudioVisualSourceService extends Service
                 'type' => $audiovisualSourceData['type']
             ]);
         
-            $monument->audiovisualSource()->create($audiovisualSourceResult);
+            return $monument->audiovisualSource()->create($audiovisualSourceResult); //TODO: goed zo?
         }
 
         public function deleteUnusedAudiovisualSources($oldAudiovisualSourceId) {
-          //  $this->_model->where('id', $oldAudiovisualSourceId)->delete(); //TODO: check if this works
+            if ($oldAudiovisualSourceId != null)
             $this->_model->where('id', $oldAudiovisualSourceId)->whereDoesntHave('monuments')->delete();
         }
 }

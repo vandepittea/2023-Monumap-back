@@ -42,8 +42,6 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
-       // return response()->json(['token' => $token], 200);
-
        return response([
         "status" => "success"
     ], 200)->withCookie(
