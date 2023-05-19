@@ -82,9 +82,7 @@ class MonumentService extends ServiceLanguages
         {
             $this->checkValidation($data);
 
-            $monumentsLanguage = $data['monuments_language'];
-            $monumentsLanguageArray = json_decode($monumentsLanguage, true);
-            $name = $monumentsLanguageArray['name'];
+            $name = $data['monuments_language']["name"];
 
             $this->checkIfMonumentAlreadyExists($name);
             DB::beginTransaction();

@@ -19,8 +19,6 @@ class MonumentLanguageService extends ServiceLanguages { //TODO: moet ik hier ex
 
     public function getOrCreateMOnumentLanguage($monumentLanguageData, $monument)
     {
-        Log::Info('MonumentLanguageService getOrCreateMonumentLanguage');
-
         $this->checkValidation($monumentLanguageData);
     
         $monumentLanguageDataResult = [
@@ -28,15 +26,14 @@ class MonumentLanguageService extends ServiceLanguages { //TODO: moet ik hier ex
             'name' => $monumentLanguageData['name'],
             'description' => $monumentLanguageData['description'],
             'type' => $monumentLanguageData['type'],
-            'accessibility' => $monumentLanguageData['accessibility'],
-            'used_materials' => $monumentLanguageData['used_materials']
+            'accessibility' => $monumentLanguageData['accessibility'] ?? null,
+            'used_materials' => $monumentLanguageData['used_materials'] ?? null
         ];
     
         $monument->monumnetLanguage()->create($monumentLanguageDataResult); //TODO: is dit correct?
     }  
     
-    
-        public function scopeOfType($query, $type) {
+    public function scopeOfType($query, $type) { //TODO: deze goed?
         return $query->where('type', $type);
     }
     

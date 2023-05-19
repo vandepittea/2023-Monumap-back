@@ -20,8 +20,9 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-            return $this->userService->registerUser($request->all());
+            $this->userService->registerUser($request->all());
         } catch (\Exception $e) {
+            //TODO: goede error teruggeven
             return response()->json(['error' => $e->getMessage()], 400);
         }
          

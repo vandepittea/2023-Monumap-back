@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Log; //TODO: remove
 
 abstract class ServiceLanguages extends Service
 {
-
     protected $_rulesTranslations = [];
 
 
@@ -18,12 +17,12 @@ abstract class ServiceLanguages extends Service
     protected function validate($data)
     {   
         $translationData = isset($data["monuments_language"]) ? $data["monuments_language"] : null;  
-        $array = json_decode($data["monuments_language"], true); // Decode the JSON string into an associative $arrayName = array('' => , );
+        //$array = json_decode($data["monuments_language"], true); // Decode the JSON string into an associative $arrayName = array('' => , );
 
-        $this->validateData($array); 
+        $this->validateData($data); 
 
           if ($translationData != null) {
-            $this->validateDataTranslations($array);
+            $this->validateDataTranslations($data);
             }
      }
 
@@ -56,16 +55,12 @@ abstract class ServiceLanguages extends Service
             Log::info("in foreach");
             Log::info($translation);
 
-            $this->validateDataTranslation($translation);
+            $this->validateData($data, $this->_rulesTranslations);
         }
-    }
-    private function validateDataTranslation($data)
-    {
-        return $this->validateData($data, $this->_rulesTranslations);
     }
 
     // -- PRESENTERS --> REFACTOR --
-    protected function presentAllWithTranslations($data)
+    protected function presentAllWithTranslations($data) //TODO: toont nu jusite vertaling? 
     {
       /* foreach ($data["data"] as $record) { //TODO: terugzetten
        $data["data"] = $this->presentFindWithTranslations($record);
@@ -87,19 +82,19 @@ abstract class ServiceLanguages extends Service
         return $data;
     }
 
-    protected function presentDetailWithTranslations($data)
-    {
-        return (count($data["translations"])) ? $data["translations"][0] : null;
-    }
+    // protected function presentDetailWithTranslations($data)
+    // {
+    //     return (count($data["translations"])) ? $data["translations"][0] : null;
+    // }
 
-    protected function presentListWithTranslations($data)
-    {
-        foreach ($data["data"] as $index => $record) {
-            $data["data"][$index]["translations"] = $this->presentDetailWithTranslations($record);
-        }
+    // protected function presentListWithTranslations($data)
+    // {
+    //     foreach ($data["data"] as $index => $record) {
+    //         $data["data"][$index]["translations"] = $this->presentDetailWithTranslations($record);
+    //     }
 
-        return $data;
-    }
+    //     return $data;
+    // }
    
 }
 

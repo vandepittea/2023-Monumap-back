@@ -19,14 +19,11 @@ class DimensionService extends Service
         public function getOrCreateDimensions($dimensionsData, $monument)
         {
             $this->checkValidation($dimensionsData);
-
-            $dimensionsDataArray = json_decode($dimensionsData, true);
-
         
             $dimensionData = [
-                'height' => $dimensionsDataArray['height'],
-                'width' => $dimensionsDataArray['width'],
-                'depth' => $dimensionsDataArray['depth']
+                'height' => $dimensionsData['height'],
+                'width' => $dimensionsData['width'],
+                'depth' => $dimensionsData['depth']
             ];
         
             $monument->dimensions()->create($dimensionData);

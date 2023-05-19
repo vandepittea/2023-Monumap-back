@@ -29,6 +29,7 @@ class UserService extends Service
         $validator = $this->validate($data);
     
         if ($validator->fails()) {
+            //TODO: goede error teruggeven
             throw new \Exception($validator->errors()->first());
         }
     

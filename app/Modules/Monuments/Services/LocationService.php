@@ -23,15 +23,14 @@ class LocationService extends Service
         {
             $this->checkValidation($locationData);
 
-            $locationDataArray = json_decode($locationData, true);
 
             $location = $this->_model->firstOrCreate(
                 [
-                    'latitude' => $locationDataArray['latitude'],
-                    'longitude' => $locationDataArray['longitude'],
-                    'city' => $locationDataArray['city'],
-                    'street' => $locationDataArray['street'] ?? null,
-                    'number' => $locationDataArray['number'] ?? null,
+                    'latitude' => $locationData['latitude'],
+                    'longitude' => $locationData['longitude'],
+                    'city' => $locationData['city'],
+                    'street' => $locationData['street'] ?? null,
+                    'number' => $locationData['number'] ?? null,
                 ]
             );
             
