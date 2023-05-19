@@ -27,7 +27,7 @@ class Monument extends Model
 
     public function dimensions()
     {
-        return $this->belongsTo(Dimension::class);
+        return $this->belongsTo(Dimensions::class);
     }
 
     public function images()

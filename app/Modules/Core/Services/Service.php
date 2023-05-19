@@ -24,7 +24,6 @@ class Service {
         $validator = $this->validate($data);
 
         if ($this->hasErrors()) {
-            Log::info("in if checkValidation in Service");
             throw new ValidationException($validator);
         }
     }

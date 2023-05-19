@@ -35,6 +35,7 @@ class AudioVisualSourceService extends Service
         }
 
         public function deleteUnusedAudiovisualSources($oldAudiovisualSourceId) {
+          //  $this->_model->where('id', $oldAudiovisualSourceId)->delete(); //TODO: check if this works
             $this->_model->where('id', $oldAudiovisualSourceId)->whereDoesntHave('monuments')->delete();
         }
 }

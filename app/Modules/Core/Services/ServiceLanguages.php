@@ -78,7 +78,7 @@ abstract class ServiceLanguages extends Service
     //     return (count($data["translations"])) ? $data["translations"][0] : null;
     // }
 
-    // protected function presentListWithTranslations($data)
+    // protected function presentListWithTranslations($data) //TODO: verwijderen!
     // {
     //     foreach ($data["data"] as $index => $record) {
     //         $data["data"][$index]["translations"] = $this->presentDetailWithTranslations($record);

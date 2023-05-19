@@ -17,7 +17,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
-class MonumentService extends ServiceLanguages
+class MonumentService extends Service
 {
         protected $_rules = [
             'location' => 'required',
@@ -72,10 +72,8 @@ class MonumentService extends ServiceLanguages
             }*/
 
             $paginator = $query->paginate($pages)->appends(request()->query());
-
-            $monuments = $this->presentAllWithTranslations($paginator->items());
-
-            return $monuments;
+       
+            return $paginator;
         }
 
         public function addMonument($data)
@@ -96,6 +94,7 @@ class MonumentService extends ServiceLanguages
         
                 if (isset($data['dimensions'])) {
                     $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    
                 }
                 if (isset($data['audiovisual_source'])) {
                     $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
@@ -141,13 +140,14 @@ class MonumentService extends ServiceLanguages
 
         public function updateMonument($id, $data)
         {
-            $this->checkValidation($data);
+            $this->checkValidation($data); 
 
             $monument = $this->checkIfMonumentExists($id);
 
             DB::beginTransaction();
 
             try {
+                Log::info($monument);
                 $oldLocationId = $monument->location_id;
                 $oldDimensionsId = $monument->dimensions_id;
                 $oldAudiovisualSourceId = $monument->audiovisual_source_id;
@@ -155,10 +155,9 @@ class MonumentService extends ServiceLanguages
                 $newLocation = $this->_locationService->getOrCreateLocation($data['location']);
             
                 $monumentData = $this->getMonumentData($data, $newLocation->id);
-                //getMonumentLanguageData //TODO: 
+                $monumentLanguageData = $this -> getMonumentLanguageData($data, $monument->id); //TODO: is dit oke? 
                 $this->updateMonumentData($monument, $monumentData);
-                //$this->updateMonumentLanguageData($monument, $monumentData); //TODO: 
-
+                $this->updateMonumentLanguageData($monument, $monumentLanguageData); 
 
                 if (isset($data['dimensions'])) {
                     $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
@@ -168,7 +167,7 @@ class MonumentService extends ServiceLanguages
                 }
     
                 $this->_imageService->deleteImages($id);
-                $this->_imageService->createImages($data['images_url'], $data['images_caption'], $id);
+                $this->_imageService->createImages($data['images']['urls'], $data['images']['captions'], $monument);
 
                 $this->_locationService->deleteUnusedLocations($oldLocationId);
                 $this->_dimensionService->deleteUnusedDimensions($oldDimensionsId);
@@ -239,7 +238,11 @@ class MonumentService extends ServiceLanguages
         
         private function updateMonumentData($monument, $monumentData) {
             $monument->update($monumentData);
-        }  
+        } 
+        
+        private function updateMonumentLanguageData($monument, $monumentLanguageData) {
+            $monument->update($monumentLanguageData);
+        }
         
         private function checkIfMonumentExists($id){
             $monument = $this->_model->find($id);

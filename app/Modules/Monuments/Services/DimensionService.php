@@ -2,7 +2,8 @@
 namespace App\Modules\Monuments\Services;
 
 use App\Modules\Core\Services\Service;
-use App\Models\Dimension;
+use App\Models\Dimensions;
+use Illuminate\Support\Facades\Log;
 
 class DimensionService extends Service
 {
@@ -12,7 +13,7 @@ class DimensionService extends Service
             'depth' => 'nullable|numeric',
         ];    
 
-        public function __construct(Dimension $model) {
+        public function __construct(Dimensions $model) {
             Parent::__construct($model);
         }   
 
