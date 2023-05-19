@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\MonumentLanguage;
 
 class Monument extends Model
 {
@@ -12,25 +13,19 @@ class Monument extends Model
     protected $fillable = [
         'name',
         'description',
+        'location_id',
         'historical_significance',
-        'type',
         'year_of_construction',
         'monument_designer',
         'accessibility',
         'used_materials',
         'weight',
         'cost_to_construct',
-        'language',
     ];
 
     protected $casts = [
         'used_materials' => 'array',
         'accessibility' => 'array',
-    ];
-
-    protected $attributes = [
-        'type' => 'Historical Buildings and Sites',
-        'language' => 'Dutch',
     ];
 
     public function location()
@@ -53,9 +48,6 @@ class Monument extends Model
         return $this->belongsTo(AudiovisualSource::class);
     }
 
-    public function scopeOfType($query, $type) {
-        return $query->where('type', $type);
-    }
 
     public function scopeOfYearOfConstruction($query, $year) {
         return $query->where('year_of_construction', $year);
@@ -73,7 +65,7 @@ class Monument extends Model
         return $query->where('language', $language);
     }
 
-    public function translationsMonument(){
+    public function MonumentLanguage(){
         return $this->hasMany(MonumentLanguage::class, 'monument_id', 'id');
     }
 

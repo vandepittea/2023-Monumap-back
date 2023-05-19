@@ -2,6 +2,8 @@
 
 namespace App\Modules\Core\Services;
 
+use Exception;
+use Hamcrest\Core\HasToString;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log; //TODO: remove
@@ -15,31 +17,45 @@ abstract class ServiceLanguages extends Service
     // -- VALIDATOR --> REFACTOR --
     protected function validate($data)
     {   
-        $translationData = isset($data["translations"]) ? $data["translations"] : null;        
-        unset($data["translations"]);
+        $translationData = isset($data["monuments_language"]) ? $data["monuments_language"] : null;  
+        $array = json_decode($data["monuments_language"], true); // Decode the JSON string into an associative $arrayName = array('' => , );
 
-        $this->validateData($data);
+        $this->validateData($array); 
 
-        if ($translationData != null) {
-            $this->validateDataTranslations($translationData);
-        }
-    }
+          if ($translationData != null) {
+            $this->validateDataTranslations($array);
+            }
+     }
 
     private function validateData($data, $rules = null)
     {
-        if ($rules == null)
+        if ($rules == null){
             $rules = $this->_rules;
+        }
+        Log::info("-------------------");
+        Log::info("in validateData");
+        log::info($data);
 
-            
         $validator = Validator::make($data, $rules);
-        if ($validator->fails()) {            
+
+
+        $this->_errors = $validator->errors(); // Initialize the _errors object
+
+        if ($validator->fails()) {   
+            Log::info("validator fails");
             $this->_errors->merge($validator->errors());
             return;
         }
     }
+
     private function validateDataTranslations($data)
     {
+        Log::info("in validateDataTranslations");
+        log::info($data);
         foreach ($data as $translation) {
+            Log::info("in foreach");
+            Log::info($translation);
+
             $this->validateDataTranslation($translation);
         }
     }

@@ -16,9 +16,9 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-/*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});*/
+Route::post('monuments/register', [AuthController::class, 'register']);
+
+Route::post('monuments/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function() {
     Route::post('/monuments', [MonumentApiController::class, 'addMonument']);
@@ -30,9 +30,3 @@ Route::middleware('auth:api')->group(function() {
 Route::get('/monuments', [MonumentApiController::class, 'getAllMonuments']);
 
 Route::get('/monuments/{id}', [MonumentApiController::class, 'getOneMonument']);
-
-Route::post('monuments/register', [AuthController::class, 'register']);
-
-Route::post('monuments/login', [AuthController::class, 'login']);
-
-

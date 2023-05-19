@@ -6,10 +6,12 @@ use App\Modules\Core\Services\Service;
 use App\Modules\Monuments\Services\LocationService;
 use App\Modules\Monuments\Services\DimensionService;
 use App\Modules\Monuments\Services\AudiovisualSourceService;
+use App\Modules\Monuments\Services\MonumentLanguageService;
 use App\Modules\Monuments\Services\ImageService;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
+use App\Models\MonumentLanguage;
 use App\Modules\Core\Services\ServiceLanguages;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -19,7 +21,6 @@ class MonumentService extends ServiceLanguages
 {
         protected $_rules = [
             'location' => 'required',
-            'historical_significance' => 'nullable|string',
             'year_of_construction' => 'required|integer|max:2023',
             'monument_designer' => 'required|string|max:50',
             'dimensions' => 'nullable',
@@ -29,34 +30,27 @@ class MonumentService extends ServiceLanguages
             'audiovisual_source' => 'nullable',
         ];    
 
-        protected $_rulesTranslations = [
-            'name' => 'required|string|max:50',
-            'description' => 'required|string',
-            'type' => 'required|string|in:War Memorials,Statues and Sculptures,Historical Buildings and Sites,National Monuments,Archaeological Sites,Cultural and Religious Monuments,Public Art Installations,Memorials for Historical Events,Natural Monuments,Tombs and Mausoleums','Oorlogsmonumenten','Beelden en sculpturen','Historische gebouwen en plaatsen','Nationale Monumenten','Archeologische sites','Culturele en religieuze monumenten','Openbare Kunstinstallaties','Herdenkingen voor historische gebeurtenissen','Natuurmonumenten,Graven en Mausolea',
-            'accessibility' => 'nullable|array|in:wheelchair-friendly,near parking areas,low-slope ramps,power-assisted doors,elevators,accessible washrooms','rolstoelvriendelijk','dichtbij parkeerplaatsen','hellingen met lage helling','elektrisch bediende deuren','liften', 'toegankelijke toiletten',
-            'used_materials' => 'nullable|array',
-            'language' => 'required|string'
-        ];
-
         private $_locationService;
         private $_dimensionService;
         private $_audiovisualSourceService;
+        private $_monumentLanguageService;
         private $_imageService;
 
-        public function __construct(Monument $model, LocationService $locationService, DimensionService $dimensionService, AudiovisualSourceService $audiovisualSourceService, ImageService $imageService) {
+        public function __construct(Monument $model, LocationService $locationService, DimensionService $dimensionService, AudiovisualSourceService $audiovisualSourceService ,ImageService $imageService) {
             Parent::__construct($model);
             $this->_locationService = $locationService;
             $this->_dimensionService = $dimensionService;
             $this->_audiovisualSourceService = $audiovisualSourceService;
+            $this -> _monumentLanguageService = new MonumentLanguageService(new MonumentLanguage()); //TODO: is dit correct??
             $this->_imageService = $imageService;
         }
 
         public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null)
         {
-            $query = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images', 'translationsMonument', 'translationsSource', 'translationsImage']);
+            $query = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images', 'MonumentLanguage', 'translationsSource', 'translationsImage']);
 
             if ($type) {
-                $query->whereHas('translationsMonument', function ($query) use ($type) {
+                $query->whereHas('MonumentLanguage', function ($query) use ($type) {
                     $query->where('type', $type);
                 });
             }    
@@ -88,21 +82,36 @@ class MonumentService extends ServiceLanguages
         {
             $this->checkValidation($data);
 
-            $this->checkIfMonumentAlreadyExists($data['name']);
-        
+            $monumentsLanguage = $data['monuments_language'];
+            $monumentsLanguageArray = json_decode($monumentsLanguage, true);
+            $name = $monumentsLanguageArray['name'];
+
+            $this->checkIfMonumentAlreadyExists($name);
             DB::beginTransaction();
         
             try {
                 $location = $this->_locationService->getOrCreateLocation($data['location']);
         
                 $monumentData = $this->getMonumentData($data, $location->id);
+                
+                Log::info("monumentData: " );
+                Log::info( $monumentData);
+                Log::debug("vor createMonument --------------------");
+
                 $monument = $this->createMonument($monumentData);
+                Log::Debug("na create id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                $getMonumentLanguageData = $this->getMonumentLanguageData($data, $monument->id);
         
                 if (isset($data['dimensions'])) {
                     $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
                 }
                 if (isset($data['audiovisual_source'])) {
                     $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                }
+
+                if (isset($data['monuments_language'])){
+                    $this->_monumentLanguageService->getOrCreateMOnumentLanguage($data['monuments_language'], $monument);
                 }
                 
                 $this->_imageService->createImages($data['images']['urls'], $data['images']['captions'], $monument);
@@ -135,7 +144,7 @@ class MonumentService extends ServiceLanguages
         public function getOneMonument($id){
             $monument = $this->checkIfMonumentExists($id);
             
-            $monument->load(['location', 'dimensions', 'images', 'audiovisualSource', 'translationsMonument', 'translationsSource', 'translationsImage']);
+            $monument->load(['location', 'dimensions', 'images', 'audiovisualSource', 'MonumentLanguage', 'translationsSource', 'translationsImage']);
             return ["data" => $monument];
         }
 
@@ -155,7 +164,10 @@ class MonumentService extends ServiceLanguages
                 $newLocation = $this->_locationService->getOrCreateLocation($data['location']);
             
                 $monumentData = $this->getMonumentData($data, $newLocation->id);
+                //getMonumentLanguageData //TODO: 
                 $this->updateMonumentData($monument, $monumentData);
+                //$this->updateMonumentLanguageData($monument, $monumentData); //TODO: 
+
 
                 if (isset($data['dimensions'])) {
                     $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
@@ -200,27 +212,41 @@ class MonumentService extends ServiceLanguages
         
         private function getMonumentData($data, $locationId)  
         {
+            Log::debug($data);
             $monumentData = array_intersect_key($data, array_flip([
+                'year_of_construction',
+                'monument_designer',
+                'weight',
+                'cost_to_construct',
+            ]));
+            
+            $monumentData['location_id'] = $locationId;
+
+            return $monumentData;
+        }
+
+        private function getMonumentLanguageData($data, $monumentId)
+        {
+            $monumentLanguageData = array_intersect_key($data, array_flip([
                 'name',
                 'description',
                 'historical_significance',
                 'type',
-                'year_of_construction',
-                'monument_designer',
                 'accessibility',
                 'used_materials',
-                'weight',
-                'cost_to_construct',
                 'language'
             ]));
-        
-            $monumentData['location_id'] = $locationId;
-        
-            return $monumentData;
+
+            $monumentLanguageData['monument_id'] = $monumentId;
+
+            return $monumentLanguageData;
         }
         
         private function createMonument($monumentData)
         {
+            Log::info("*********************************************");
+            Log::info("createMonumnetData");
+            Log::info($monumentData);
             return $this->_model->create($monumentData);
         }        
         
@@ -239,7 +265,9 @@ class MonumentService extends ServiceLanguages
         }
 
         private function checkIfMonumentAlreadyExists($name){
-            $monument = $this->_model->where('name', $name)->first();
+            $monument = $this->_model->whereHas('monumentLanguage', function($query) use ($name) {
+            $query->where('name', $name);
+            })->first();
             if ($monument) {
                 throw new AlreadyExistsException('Monument already exists.');
             }

@@ -20,36 +20,42 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-            $this->userService->registerUser($request->all());
+            return $this->userService->registerUser($request->all());
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
-
+         
         return response()->noContent();
     }
 
-    public function login(Request $request)
-    {
+    public function login(Request$request){
+
         $credentials = $request->only('username', 'password');
 
         if (!$token = Auth::attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
-
-        return response([
-            "status" => "success"
-        ], 200)->withCookie(
-            'token',
-            $token,
-            config('jwt.ttl'),
-            '/',
-            null,
-            true,
-            true,
-            false,
-            "None"
-        );
         
+        try {
+            $token = $this->userService->login($request);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+       // return response()->json(['token' => $token], 200);
+
+       return response([
+        "status" => "success"
+    ], 200)->withCookie(
+        'token',
+        $token,
+        config('jwt.ttl'),
+        '/',
+        null,
+        true,
+        true,
+        false,
+        "None"
+    );
     }
 
 }

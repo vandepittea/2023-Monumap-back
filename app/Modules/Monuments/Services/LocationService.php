@@ -3,6 +3,7 @@ namespace App\Modules\Monuments\Services;
 
 use App\Modules\Core\Services\Service;
 use App\Models\Location;
+Use Illuminate\Support\Facades\Log;
 
 class LocationService extends Service
 {
@@ -22,16 +23,18 @@ class LocationService extends Service
         {
             $this->checkValidation($locationData);
 
+            $locationDataArray = json_decode($locationData, true);
+
             $location = $this->_model->firstOrCreate(
                 [
-                    'latitude' => $locationData['latitude'],
-                    'longitude' => $locationData['longitude'],
-                    'city' => $locationData['city'],
-                    'street' => $locationData['street'] ?? null,
-                    'number' => $locationData['number'] ?? null,
+                    'latitude' => $locationDataArray['latitude'],
+                    'longitude' => $locationDataArray['longitude'],
+                    'city' => $locationDataArray['city'],
+                    'street' => $locationDataArray['street'] ?? null,
+                    'number' => $locationDataArray['number'] ?? null,
                 ]
             );
-        
+            
             return $location;
         }
         

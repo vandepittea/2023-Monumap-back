@@ -5,14 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Log;
 
 use App\Model\Monument;
 
 class Service {
     protected $_model;
     protected $_errors;
-//    protected $_validationErrors; //TODO: remove
-
     protected $_rules = [];
 
     public function __construct(Model $model)
@@ -25,6 +24,7 @@ class Service {
         $validator = $this->validate($data);
 
         if ($this->hasErrors()) {
+            Log::info("in if checkValidation in Service");
             throw new ValidationException($validator);
         }
     }
@@ -32,9 +32,10 @@ class Service {
     protected function validate($data){
         $validator = Validator::make($data, $this->_rules);
 
+        //$validator = Validator::make($data, $this->_rules);
+
         if($validator->fails()){
             $this->_errors = $validator->errors();
-
         }
 
         return $validator;

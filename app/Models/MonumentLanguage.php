@@ -14,4 +14,9 @@ class MonumentLanguage extends Model
     {
         return $this->belongsTo(Monument::class, "monument_id", "id");
     }
+
+    protected $attributes = [
+        'type' => 'Historical Buildings and Sites',
+        'language' => 'Dutch',
+    ];
 }

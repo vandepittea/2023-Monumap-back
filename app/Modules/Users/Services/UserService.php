@@ -33,25 +33,21 @@ class UserService extends Service
         }
     
         $data['password'] = Hash::make($data['password']);
-
     
         $user = $this->_model->create($data);
     
         return $user ? true : false;
     }
 
-    function login($data) : ?string { //TODO: is dit Correct?
-        $validator = Validator::make($data, $this->credentialRules);
-        Log::info($data);
+    function login($data) : ?string {
+
+        $validator = Validator::make($data->all(), $this->credentialRules);
         if ($validator->fails()) return null;
     
         $credentials = $data->only('username', 'password');
-     //   $credentials['password'] = Hash::make($credentials['password']);
 
-         Log::info($credentials);
-
-    
         $token = auth()->attempt($credentials);
+
         return $token;
     }
 }

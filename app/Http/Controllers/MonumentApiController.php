@@ -37,12 +37,12 @@ class MonumentApiController extends Controller
             return $monument;
         } catch (AlreadyExistsException $e) {
             return response()->json([
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], $e->getStatus());
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], $e->status);
         }
     }    
