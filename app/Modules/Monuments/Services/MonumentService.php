@@ -91,15 +91,8 @@ class MonumentService extends ServiceLanguages
                 $location = $this->_locationService->getOrCreateLocation($data['location']);
         
                 $monumentData = $this->getMonumentData($data, $location->id);
-                
-                Log::info("monumentData: " );
-                Log::info( $monumentData);
-                Log::debug("vor createMonument --------------------");
 
                 $monument = $this->createMonument($monumentData);
-                Log::Debug("na create id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
-                $getMonumentLanguageData = $this->getMonumentLanguageData($data, $monument->id);
         
                 if (isset($data['dimensions'])) {
                     $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
@@ -109,7 +102,7 @@ class MonumentService extends ServiceLanguages
                 }
 
                 if (isset($data['monuments_language'])){
-                    $this->_monumentLanguageService->getOrCreateMOnumentLanguage($data['monuments_language'], $monument);
+                    $this->_monumentLanguageService->getOrCreateMonumentLanguage($data['monuments_language'], $monument);
                 }
                 
                 $this->_imageService->createImages($data['images']['urls'], $data['images']['captions'], $monument);
@@ -210,7 +203,6 @@ class MonumentService extends ServiceLanguages
         
         private function getMonumentData($data, $locationId)  
         {
-            Log::debug($data);
             $monumentData = array_intersect_key($data, array_flip([
                 'year_of_construction',
                 'monument_designer',
@@ -242,9 +234,6 @@ class MonumentService extends ServiceLanguages
         
         private function createMonument($monumentData)
         {
-            Log::info("*********************************************");
-            Log::info("createMonumnetData");
-            Log::info($monumentData);
             return $this->_model->create($monumentData);
         }        
         

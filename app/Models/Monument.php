@@ -11,14 +11,10 @@ class Monument extends Model
     use HasFactory;
 
     protected $fillable = [
-        //'name',
-        //'description',
         'location_id',
         'historical_significance',
         'year_of_construction',
         'monument_designer',
-       // 'accessibility',
-       // 'used_materials',
         'weight',
         'cost_to_construct',
     ];

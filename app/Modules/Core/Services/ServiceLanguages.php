@@ -31,9 +31,6 @@ abstract class ServiceLanguages extends Service
         if ($rules == null){
             $rules = $this->_rules;
         }
-        Log::info("-------------------");
-        Log::info("in validateData");
-        log::info($data);
 
         $validator = Validator::make($data, $rules);
 
@@ -41,7 +38,6 @@ abstract class ServiceLanguages extends Service
         $this->_errors = $validator->errors(); // Initialize the _errors object
 
         if ($validator->fails()) {   
-            Log::info("validator fails");
             $this->_errors->merge($validator->errors());
             return;
         }
@@ -49,12 +45,7 @@ abstract class ServiceLanguages extends Service
 
     private function validateDataTranslations($data)
     {
-        Log::info("in validateDataTranslations");
-        log::info($data);
         foreach ($data as $translation) {
-            Log::info("in foreach");
-            Log::info($translation);
-
             $this->validateData($data, $this->_rulesTranslations);
         }
     }

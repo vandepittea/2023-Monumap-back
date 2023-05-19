@@ -17,7 +17,7 @@ class MonumentLanguageService extends ServiceLanguages { //TODO: moet ik hier ex
         'language' => 'required|string'
     ];
 
-    public function getOrCreateMOnumentLanguage($monumentLanguageData, $monument)
+    public function getOrCreateMonumentLanguage($monumentLanguageData, $monument)
     {
         $this->checkValidation($monumentLanguageData);
     
@@ -30,7 +30,7 @@ class MonumentLanguageService extends ServiceLanguages { //TODO: moet ik hier ex
             'used_materials' => $monumentLanguageData['used_materials'] ?? null
         ];
     
-        $monument->monumnetLanguage()->create($monumentLanguageDataResult); //TODO: is dit correct?
+        $monument->monumentLanguage()->create($monumentLanguageDataResult); //TODO: is dit correct?
     }  
     
     public function scopeOfType($query, $type) { //TODO: deze goed?

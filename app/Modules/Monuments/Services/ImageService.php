@@ -4,6 +4,7 @@ namespace App\Modules\Monuments\Services;
 use App\Modules\Core\Services\Service;
 use Illuminate\Validation\Rule;
 use App\Models\Image;
+use Illuminate\Support\Facades\Log;
 
 class ImageService extends Service
 {
@@ -26,7 +27,7 @@ class ImageService extends Service
             foreach ($imagesUrl as $key => $image) {
                 $imagesData[] = [
                     'url' => $image,
-                    'caption' => $imagesCaption[$key],
+                    'captions' => $imagesCaption[$key],
                     'monument_id' => $monument->id
                 ];
 
