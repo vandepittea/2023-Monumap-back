@@ -34,8 +34,9 @@ class MonumentApiController extends Controller
             $data = $request->all();
 
             $monument = $this->_service->addMonument($data);
+            $monument->load('location', 'dimensions', 'images', 'audiovisualSource', 'monumentLanguage', 'images.imageLanguage', 'audiovisualSource.audiovisualSourceLanguage');
 
-            return $monument;
+            return response()->json($monument);
         } catch (AlreadyExistsException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -46,7 +47,7 @@ class MonumentApiController extends Controller
                 'errors' => $e->errors(),
             ], $e->status);
         }
-    }    
+    }
 
     public function getOneMonument($id) {
         try {

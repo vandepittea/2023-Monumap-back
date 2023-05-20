@@ -52,7 +52,7 @@ class MonumentService extends Service
 
         public function getAllMonuments($perPage, $page, $type = null, $year = null, $designer = null, $cost = null, $language = null)
         {
-            $query = $this->_model->with(['location', 'dimensions', 'images']);
+            $query = $this->_model->with('location', 'dimensions', 'images', 'audiovisualSource', 'monumentLanguage', 'images.imageLanguage', 'audiovisualSource.audiovisualSourceLanguage');
 
             if ($type) {
                 $query->whereHas('MonumentLanguage', function ($query) use ($type) {
@@ -96,10 +96,12 @@ class MonumentService extends Service
                 $monument = $this->createMonument($monumentData);
         
                 if (isset($data['dimensions'])) {
-                    $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    $dimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    $this->updateMonumentDimensions($monument, $dimensions);
                 }
                 if (isset($data['audiovisual_source'])) {
-                    $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                    $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                    $this->updateMonumentAudiovisualSource($monument, $audiovisualSource);
                 }
                 
                 $this->_imageService->createImages($data['images'], $monument);
@@ -246,5 +248,17 @@ class MonumentService extends Service
             if ($monument) {
                 throw new AlreadyExistsException('Monument already exists.');
             }
+        }
+
+        private function updateMonumentDimensions($monument, $dimensions)
+        {
+            $monument->dimensions_id = $dimensions->id;
+            $monument->save();
+        }
+
+        private function updateMonumentaudiovisualSource($monument, $audiovisualSource)
+        {
+            $monument->audiovisual_source_id = $audiovisualSource->id;
+            $monument->save();
         }
 }
