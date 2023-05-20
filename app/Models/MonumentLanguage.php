@@ -9,25 +9,21 @@ class MonumentLanguage extends Model
 {
     use HasFactory;
 
+    protected $table = "monuments_language";
+
     protected $fillable = [
         'name',
         'description',
-        'location_id',
         'historical_significance',
-        'year_of_construction',
-        'monument_designer',
         'accessibility',
         'used_materials',
-        'weight',
-        'cost_to_construct',
+        'language'
     ];
 
     protected $casts = [
         'used_materials' => 'array',
         'accessibility' => 'array',
     ];
-    
-    protected $table = "monuments_language";
 
     public function monument()
     {
@@ -36,6 +32,6 @@ class MonumentLanguage extends Model
 
     protected $attributes = [
         'type' => 'Historical Buildings and Sites',
-        'language' => 'Dutch',
+        'language' => 'English',
     ];
 }

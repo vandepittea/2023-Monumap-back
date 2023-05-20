@@ -9,4 +9,8 @@ class AudioSourceLanguage extends Model
 {
     use HasFactory;
     protected $table = "audiovisual_sources_language";
+
+    protected $fillable = [
+        'title'
+    ];
 }

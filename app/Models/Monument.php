@@ -12,7 +12,6 @@ class Monument extends Model
 
     protected $fillable = [
         'location_id',
-        'historical_significance',
         'year_of_construction',
         'monument_designer',
         'weight',
@@ -51,20 +50,16 @@ class Monument extends Model
     public function scopeOfCostToConstruct($query, $cost) {
         return $query->where('cost_to_construct', $cost);
     }
-    
-   /* public function scopeOfLanguage($query, $language) { //TODO: wegoden
-        return $query->where('language', $language);
-    }*/
 
     public function monumentLanguage(){
         return $this->hasMany(MonumentLanguage::class, 'monument_id', 'id');
     }
 
-    public function translationsSource(){
+    public function audiovisualSourceLanguage(){
         return $this->hasMany(AudioSourceLanguage::class, 'source_id', 'id');
     }
 
-    public function translationsImage(){
+    public function ImagesLanguage(){
         return $this->hasMany(ImageLanguage::class, 'image_id', 'id');
     }
 

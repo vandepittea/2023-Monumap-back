@@ -10,13 +10,12 @@ class AudiovisualSource extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title',
         'url',
         'type',
     ];
 
     protected $attributes = [
-        'type' => 'video',
+        'type' => 'video'
     ];
 
     public function monument()
