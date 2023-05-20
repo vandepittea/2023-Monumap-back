@@ -32,7 +32,7 @@ class AudioVisualSourceService extends Service
 
         $audiovisualSource = $monument->audiovisualSource()->create($audiovisualSourceResult);
 
-        $this->getOrCreateAudiovisualSourceTranslations($audiovisualSource, $audiovisualSourceData['translations']);
+        $this->_audioVisualSourceLanguageService->getOrCreateAudiovisualSourceLanguage($audiovisualSourceData['translations'], $audiovisualSource);
 
         return $audiovisualSource;
     }
@@ -44,13 +44,6 @@ class AudioVisualSourceService extends Service
                 ->where('id', $oldAudiovisualSourceId)
                 ->whereDoesntHave('monuments')
                 ->first();
-        }
-    }    
-
-    protected function getOrCreateAudiovisualSourceTranslations($audiovisualSource, $translations)
-    {
-        foreach ($translations as $translationData) {
-            $this->_audioVisualSourceLanguageService->getOrCreateAudiovisualSourceLanguage($translationData, $audiovisualSource);
         }
     }
 }
