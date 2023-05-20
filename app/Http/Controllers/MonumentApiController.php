@@ -7,7 +7,6 @@ use App\Modules\Monuments\Services\MonumentService;
 use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Log;
 
 class MonumentApiController extends Controller
 {
@@ -18,14 +17,15 @@ class MonumentApiController extends Controller
     }
 
     public function getAllMonuments(Request $request) {
-        $pages = $request->get('pages', 10);
+        $perPage = $request->get('perPage', 10);
+        $page = $request->get('page', 1);
         $type = $request->query('type');
         $year = $request->query('year');
         $designer = $request->query('designer');
         $cost = $request->query('cost');
         $language = $request->query('language');
     
-        return $this->_service->getAllMonuments($pages, $type, $year, $designer, $cost, $language);
+        return $this->_service->getAllMonuments($perPage, $page, $type, $year, $designer, $cost, $language);
     }
 
     public function addMonument(Request $request)

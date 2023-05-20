@@ -22,3 +22,4 @@ class AudioSourceLanguage extends Model
         return $this->belongsTo(AudiovisualSource::class, 'audiovisual_source_id', 'id');
     }    
 }
+

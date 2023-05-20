@@ -50,7 +50,7 @@ class MonumentService extends Service
             $this->_monumentLanguageService = new monumentLanguageService($model);
         }
 
-        public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null)
+        public function getAllMonuments($perPage, $page, $type = null, $year = null, $designer = null, $cost = null, $language = null)
         {
             $query = $this->_model->with(['location', 'dimensions', 'images']);
 
@@ -76,7 +76,7 @@ class MonumentService extends Service
                 $query->OfLanguage($language);
             }*/
 
-            $paginator = $query->paginate($pages)->appends(request()->query());
+            $paginator = $query->paginate($perPage, ['*'], 'page', $page)->appends(request()->query());
        
             return $paginator;
         }
