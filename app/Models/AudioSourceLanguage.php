@@ -11,6 +11,8 @@ class AudioSourceLanguage extends Model
     protected $table = "audiovisual_sources_language";
 
     protected $fillable = [
-        'title'
+        'audiovisual_source_id',
+        'title',
+        'language'
     ];
 }

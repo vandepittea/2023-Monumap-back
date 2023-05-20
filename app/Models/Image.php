@@ -11,8 +11,7 @@ class Image extends Model
 
     protected $fillable = [
         'monument_id',
-        'url',
-        'caption',
+        'url'
     ];
 
     public function monument()
