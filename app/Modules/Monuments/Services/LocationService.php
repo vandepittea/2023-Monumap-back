@@ -3,7 +3,6 @@ namespace App\Modules\Monuments\Services;
 
 use App\Modules\Core\Services\Service;
 use App\Models\Location;
-Use Illuminate\Support\Facades\Log;
 
 class LocationService extends Service
 {

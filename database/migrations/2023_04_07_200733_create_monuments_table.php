@@ -27,7 +27,16 @@ return new class extends Migration
                 'Cultural and Religious Monuments',
                 'Public Art Installations',
                 'Memorials for Historical Events',
-                'Natural Monuments,Tombs and Mausoleums'
+                'Natural Monuments and Tombs and Mausoleums',
+                'Oorlogsmonumenten',
+                'Beelden en Sculpturen',
+                'Historische Gebouwen en Plaatsen',
+                'Nationale Monumenten',
+                'Archeologische Plaatsen',
+                'Culturele en Religieuze Monumenten',
+                'Openbare Kunstinstallaties',
+                'Gedenktekens voor Historische Evenementen',
+                'Natuurmonumenten en Graven en Mausoleums',
             ]);
             $table->integer('year_of_construction');
             $table->string('monument_designer');
@@ -35,8 +44,14 @@ return new class extends Migration
             'wheelchair-friendly',
             'near parking areas',
             'low-slope ramps',
-            'power-assisted doors',
-            'elevators, accessible washrooms');
+            'power-assisted doors and elevators',
+            'accessible washrooms',
+            'rolstoelvriendelijk',
+            'in de buurt van parkeerterreinen',
+            'laaghellende opritten',
+            'elektrisch ondersteunde deuren en liften',
+            'toegankelijke toiletten'
+        );
             $table->json('used_materials')->nullable();
             $table->foreignId('dimensions_id')->nullable()->constrained('dimensions')->onDelete('cascade');
             $table->integer('weight')->nullable();

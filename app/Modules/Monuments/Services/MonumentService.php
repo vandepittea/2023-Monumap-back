@@ -2,7 +2,6 @@
 namespace App\Modules\Monuments\Services;
 
 use App\Models\Monument;
-use Illuminate\Database\Eloquent\Model;
 use App\Modules\Core\Services\Service;
 use App\Modules\Monuments\Services\LocationService;
 use App\Modules\Monuments\Services\DimensionService;
@@ -15,24 +14,19 @@ use App\Exceptions\NotFoundException;
 use App\Models\AudioSourceLanguage;
 use App\Models\AudiovisualSource;
 use App\Models\ImageLanguage;
-use App\Models\MonumentLanguage;
 use App\Models\Image;
-use App\Modules\Core\Services\ServiceLanguages;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 
 class MonumentService extends Service
 {
         protected $_rules = [
             'location' => 'required',
-            'year_of_construction' => 'required|integer|max:2023',
-            'monument_designer' => 'required|string|max:50',
+            'year_of_construction' => 'required|integer',
+            'monument_designer' => 'required|string',
             'dimensions' => 'nullable',
             'weight' => 'nullable|numeric',
             'cost_to_construct' => 'nullable|numeric',
             'images' => 'required',
-            'audiovisual_source' => 'nullable',
+            'audiovisual_source' => 'nullable'
         ];    
 
         private $_locationService;

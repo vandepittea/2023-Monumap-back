@@ -10,8 +10,8 @@ class MonumentLanguageService extends ServiceLanguages
         'name' => 'required|string|max:50',
         'description' => 'required|string',
         'historical_significance' => 'nullable|string',
-        'type' => 'required|string|in:War Memorials,Statues and Sculptures,Historical Buildings and Sites,National Monuments,Archaeological Sites,Cultural and Religious Monuments,Public Art Installations,Memorials for Historical Events,Natural Monuments,Tombs and Mausoleums',
-        'accessibility' => 'nullable|array|in:wheelchair-friendly,near parking areas,low-slope ramps,power-assisted doors,elevators,accessible washrooms',
+        'type' => 'required|string|in:War Memorials,Statues and Sculptures,Historical Buildings and Sites,National Monuments,Archaeological Sites and Cultural and Religious Monuments,Public Art Installations,Memorials for Historical Events,Natural Monuments,Tombs and Mausoleums,Oorlogsmonumenten,Beelden en Sculpturen,Historische Gebouwen en Plaatsen,Nationale Monumenten,Archeologische Plaatsen,Culturele en Religieuze Monumenten,Openbare Kunstinstallaties,Gedenktekens voor Historische Evenementen,Natuurmonumenten en Graven en Mausoleums',
+        'accessibility' => 'nullable|array|in:wheelchair-friendly,near parking areas,low-slope ramps,power-assisted doors and elevators,accessible washrooms,rolstoelvriendelijk,in de buurt van parkeerterreinen,laaghellende opritten,elektrisch ondersteunde deuren en liften,toegankelijke toiletten',
         'used_materials' => 'nullable|array',
         'language' => 'required|string|in:English,Dutch'
     ];
