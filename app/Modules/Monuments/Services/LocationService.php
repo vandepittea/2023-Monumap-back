@@ -23,7 +23,6 @@ class LocationService extends Service
         {
             $this->checkValidation($locationData);
 
-
             $location = $this->_model->firstOrCreate(
                 [
                     'latitude' => $locationData['latitude'],

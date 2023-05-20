@@ -51,6 +51,18 @@ class Monument extends Model
         return $query->where('cost_to_construct', $cost);
     }
 
+    public function scopeOfMonumentLanguage($query, $language) { // TODO: om op language te filteren
+        return $query->where('language', $language);
+    }
+
+    public function scopeOfSourceLanguage($query, $language) { // TODO: om op language te filteren
+        return $query->where('language', $language);
+    }
+
+    public function scopeOfImageLanguage($query, $language) { // TODO: om op language te filteren
+        return $query->where('language', $language);
+    }
+
     public function monumentLanguage(){
         return $this->hasMany(MonumentLanguage::class, 'monument_id', 'id');
     }

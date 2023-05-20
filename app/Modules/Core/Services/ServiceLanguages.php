@@ -12,12 +12,10 @@ abstract class ServiceLanguages extends Service
 {
     protected $_rulesTranslations = [];
 
-
     // -- VALIDATOR --> REFACTOR --
     protected function validate($data)
     {   
         $translationData = isset($data["monuments_language"]) ? $data["monuments_language"] : null;  
-        //$array = json_decode($data["monuments_language"], true); // Decode the JSON string into an associative $arrayName = array('' => , );
 
         $this->validateData($data); 
 
@@ -72,20 +70,5 @@ abstract class ServiceLanguages extends Service
 
         return $data;
     }
-
-    // protected function presentDetailWithTranslations($data)
-    // {
-    //     return (count($data["translations"])) ? $data["translations"][0] : null;
-    // }
-
-    // protected function presentListWithTranslations($data) //TODO: verwijderen!
-    // {
-    //     foreach ($data["data"] as $index => $record) {
-    //         $data["data"][$index]["translations"] = $this->presentDetailWithTranslations($record);
-    //     }
-
-    //     return $data;
-    // }
-   
 }
 

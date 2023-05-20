@@ -45,9 +45,9 @@ class MonumentService extends Service
             $this->_imageService = $imageService;
         }
 
-        public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null)
+        public function getAllMonuments($perPage = 10, $page = 1, $type = null, $year = null, $designer = null, $cost = null, $language = null)
         {
-            $query = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images', 'MonumentLanguage', 'translationsSource', 'translationsImage']);
+            $query = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images', 'MonumentLanguage', 'translationsSource', 'translationsImage']); //TODO: Translations hier correct?
 
             if ($type) {
                 $query->whereHas('MonumentLanguage', function ($query) use ($type) {
@@ -67,11 +67,15 @@ class MonumentService extends Service
                 $query->OfCostToConstruct($cost);
             }
 
-           /* if ($language) { //TODO: wegdoen
-                $query->OfLanguage($language);
-            }*/
+            if ($language) {
+                $query-> OfMonumentLanguage($language);
+                $query -> OfSourceLanguage($language);
+                $query -> OfImageLanguage($language);
+            }
 
-            $paginator = $query->paginate($pages)->appends(request()->query());
+//            $paginator = $query->paginate($pages)->appends(request()->query());
+            $paginator = $query->paginate($perPage, ['*'], 'page', $page)->appends(request()->query());
+
        
             return $paginator;
         }
