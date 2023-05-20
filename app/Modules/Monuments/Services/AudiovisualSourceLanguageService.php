@@ -15,19 +15,20 @@ class AudiovisualSourceLanguageService extends ServiceLanguages
 
     public function getOrCreateAudiovisualSourceLanguage($audiovisualSourceLanguageData, $audiovisualSource)
     {
-        $this->checkValidation($audiovisualSourceLanguageData);
+        $this->validate($audiovisualSourceLanguageData);
 
-        $audiovisualSourceLanguageDataResult = [
-            'audiovisual_source' => $audiovisualSourceLanguageData['audiovisual_source'],
-            'title' => $audiovisualSourceLanguageData['title'],
-            'language' => $audiovisualSourceLanguageData['language']
-        ];
+        foreach ($audiovisualSourceLanguageData as $language => $translationData) {
 
-        $audiovisualSourceLanguage = AudioSourceLanguage::updateOrCreate(
-            ['audiovisual_source' => $audiovisualSourceLanguageData['audiovisual_source'], 'language' => $audiovisualSourceLanguageData['language']],
-            $audiovisualSourceLanguageDataResult
-        );
+            $audiovisualSourceLanguageDataResult = [
+                'title' => $translationData['title'],
+                'language' => $translationData['language'],
+                'audiovisual_source_id' => $audiovisualSource->id,
+            ];
 
-        return $audiovisualSourceLanguage;
+            AudioSourceLanguage::updateOrCreate(
+                ['audiovisual_source_id' => $audiovisualSource->id, 'language' => $translationData['language']],
+                $audiovisualSourceLanguageDataResult
+            );
+        }
     }
 }
