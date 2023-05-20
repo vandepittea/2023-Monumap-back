@@ -8,7 +8,7 @@ use App\Models\ImageLanguage;
 class ImageLanguageService extends ServiceLanguages
 {
     protected $_rulesTranslations = [
-        'images.*.caption' => 'required|string|max:50',
+        'caption' => 'required|string|max:50',
     ];
 
     public function getOrCreateImageLanguage($imageLanguageData, $image)

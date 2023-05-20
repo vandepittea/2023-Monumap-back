@@ -9,7 +9,7 @@ use App\Models\Image;
 class ImageService extends Service
 {
     protected $_rules = [
-        'images.*.url' => 'required|url'
+        '*.url' => 'required|url'
     ];
 
     protected $_imageLanguageService;

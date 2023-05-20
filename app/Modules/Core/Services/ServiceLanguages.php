@@ -3,6 +3,7 @@
 namespace App\Modules\Core\Services;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 abstract class ServiceLanguages extends Service
 {
@@ -20,7 +21,7 @@ abstract class ServiceLanguages extends Service
         foreach ($data as $translation) {
             $validator = Validator::make($translation, $this->_rulesTranslations);
             if ($validator->fails()) {
-                $this->_errors->merge($validator->errors());
+                throw new ValidationException($validator);
             }
         }
     }

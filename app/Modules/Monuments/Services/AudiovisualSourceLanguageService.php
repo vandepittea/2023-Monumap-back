@@ -8,7 +8,6 @@ use App\Models\AudioSourceLanguage;
 class AudiovisualSourceLanguageService extends ServiceLanguages
 {
     protected $_rulesTranslations = [
-        'audiovisual_source' => 'required',
         'title' => 'required|string',
         'language' => 'required|string'
     ];
