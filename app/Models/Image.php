@@ -18,4 +18,8 @@ class Image extends Model
     {
         return $this->belongsTo(Monument::class);
     }
+
+    public function imageLanguage(){
+        return $this->hasMany(ImageLanguage::class, 'image_id', 'id');
+    }
 }

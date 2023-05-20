@@ -12,7 +12,11 @@ use App\Modules\Monuments\Services\ImageService;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
+use App\Models\AudioSourceLanguage;
+use App\Models\AudiovisualSource;
+use App\Models\ImageLanguage;
 use App\Models\MonumentLanguage;
+use App\Models\Image;
 use App\Modules\Core\Services\ServiceLanguages;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -37,18 +41,18 @@ class MonumentService extends Service
         private $_monumentLanguageService;
         private $_imageService;
 
-        public function __construct(Monument $model, LocationService $locationService, DimensionService $dimensionService, AudiovisualSourceService $audiovisualSourceService ,ImageService $imageService, MonumentLanguageService $monumentLanguageService) {
+        public function __construct(Monument $model, LocationService $locationService, DimensionService $dimensionService) {
             Parent::__construct($model);
             $this->_locationService = $locationService;
             $this->_dimensionService = $dimensionService;
-            $this->_audiovisualSourceService = $audiovisualSourceService;
-            $this->_imageService = $imageService;
-            $this->_monumentLanguageService = $monumentLanguageService;
+            $this->_audiovisualSourceService = new AudioVisualSourceService(new AudiovisualSource(), new AudioVisualSourceLanguageService(new AudioSourceLanguage()));
+            $this->_imageService = new ImageService(new Image(), new ImageLanguageService(new ImageLanguage()));
+            $this->_monumentLanguageService = new monumentLanguageService($model);
         }
 
         public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null)
         {
-            $query = $this->_model->with(['location', 'dimensions', 'audiovisualSource', 'images', 'MonumentLanguage', 'translationsSource', 'translationsImage']);
+            $query = $this->_model->with(['location', 'dimensions', 'images']);
 
             if ($type) {
                 $query->whereHas('MonumentLanguage', function ($query) use ($type) {
@@ -81,7 +85,7 @@ class MonumentService extends Service
         {
             $this->checkValidation($data);
 
-            $this->checkIfMonumentAlreadyExists('en', $data['language']['name']);
+            $this->checkIfMonumentAlreadyExists('en', $data['translations']);
         
             DB::beginTransaction();
         
@@ -204,7 +208,7 @@ class MonumentService extends Service
                 'used_materials',
                 'weight',
                 'cost_to_construct',
-                'language'
+                'translations'
             ]));
         
             $monumentData['location_id'] = $locationId;
@@ -215,13 +219,13 @@ class MonumentService extends Service
         private function createMonument($monumentData)
         {
             $monument = $this->_model->create($monumentData);
-            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['language'], $monument);
+            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['translations'], $monument);
             return $monument;
         }        
         
         private function updateMonumentData($monument, $monumentData) {
             $monument->update($monumentData);
-            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['language'], $monument);
+            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['translations'], $monument);
         }
         
         private function checkIfMonumentExists($id){

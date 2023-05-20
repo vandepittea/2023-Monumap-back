@@ -19,6 +19,7 @@ return new class extends Migration
             $table->id();
             $table->integer("image_id");
             $table->string('caption');
+            $table->string('language');
             $table->timestamps();
         });
     }

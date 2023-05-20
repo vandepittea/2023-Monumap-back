@@ -24,6 +24,6 @@ class AudiovisualSource extends Model
     }
 
     public function audiovisualSourceLanguage(){
-        return $this->hasMany(AudiovisualSourceLanguage::class, 'audiovisual_source_id', 'id');
+        return $this->hasMany(AudioSourceLanguage::class, 'audiovisual_source_id', 'id');
     }
 }

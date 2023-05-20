@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 class MonumentApiController extends Controller
 {
     private $_service;
+
     public function __construct(MonumentService $service){
         $this->_service = $service;
     }

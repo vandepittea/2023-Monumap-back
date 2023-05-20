@@ -3,8 +3,6 @@
 namespace App\Modules\Monuments\Services;
 
 use App\Modules\Core\Services\ServiceLanguages;
-use App\Models\MonumentLanguage;
-use Illuminate\Support\Facades\Log;
 
 class MonumentLanguageService extends ServiceLanguages
 {
@@ -20,22 +18,25 @@ class MonumentLanguageService extends ServiceLanguages
 
     public function getOrCreateMonumentLanguage($monumentLanguageData, $monument)
     {
-        $this->checkValidation($monumentLanguageData);
+        $this->validate($monumentLanguageData);
 
-        $monumentLanguageDataResult = [
-            'language' => $monumentLanguageData['language'],
-            'name' => $monumentLanguageData['name'],
-            'description' => $monumentLanguageData['description'],
-            'type' => $monumentLanguageData['type'],
-            'accessibility' => $monumentLanguageData['accessibility'] ?? null,
-            'used_materials' => $monumentLanguageData['used_materials'] ?? null
-        ];
-
-        $monument->monumentLanguage()->updateOrCreate(
-            ['language' => $monumentLanguageData['language']],
-            $monumentLanguageDataResult
-        );
-    }
+        foreach ($monumentLanguageData as $language => $data) {    
+            $monumentLanguageDataResult = [
+                'historical_significance' => $data['historical_significance'] ?? null,
+                'name' => $data['name'],
+                'description' => $data['description'],
+                'type' => $data['type'],
+                'language' => $data['language'],
+                'accessibility' => $data['accessibility'] ?? null,
+                'used_materials' => $data['used_materials'] ?? null
+            ];
+    
+            $monument->monumentLanguage()->updateOrCreate(
+                ['language' => $language],
+                $monumentLanguageDataResult
+            );
+        }
+    }    
 
     public function scopeOfType($query, $type)
     {
