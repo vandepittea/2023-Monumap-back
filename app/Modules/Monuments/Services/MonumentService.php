@@ -102,7 +102,7 @@ class MonumentService extends Service
                     $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
                 }
                 
-                $this->_imageService->createImages($data['images']['urls'], $data['images']['captions']['en'], $data['images']['captions']['nl'], $monument);
+                $this->_imageService->createImages($data['images'], $monument);
         
                 DB::commit();
         

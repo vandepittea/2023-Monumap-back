@@ -13,18 +13,19 @@ class ImageLanguageService extends ServiceLanguages
 
     public function getOrCreateImageLanguage($imageLanguageData, $image)
     {
-        $this->checkValidation($imageLanguageData);
+        $this->validate($imageLanguageData);
 
-        $imageLanguageDataResult = [
-            'caption' => $imageLanguageData['caption'],
-            'language' => $imageLanguageData['language'],
-        ];
+        foreach ($imageLanguageData as $language => $translationData) {
+            $imageLanguageDataResult = [
+                'caption' => $translationData['caption'],
+                'language' => $translationData['language'],
+                'image_id' => $image->id,
+            ];
 
-        $imageLanguage = ImageLanguage::updateOrCreate(
-            ['image_id' => $image->id, 'language' => $imageLanguageData['language']],
-            $imageLanguageDataResult
-        );
-
-        return $imageLanguage;
+            ImageLanguage::updateOrCreate(
+                ['image_id' => $image->id, 'language' => $translationData['language']],
+                $imageLanguageDataResult
+            );
+        }
     }
 }

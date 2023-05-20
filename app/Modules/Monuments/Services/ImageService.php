@@ -21,45 +21,19 @@ class ImageService extends Service
         $this->_imageLanguageService = $imageLanguageService;
     }
 
-    public function createImages($imagesUrl, $imagesCaptionEn, $imagesCaptionNl, $monument)
-    {
-        $imagesData = [];
-    
-        foreach ($imagesUrl as $key => $image) {
-            $imagesData[] = [
-                'url' => $image,
-                'monument_id' => $monument->id,
-                'translations' => [
-                    [
-                        'caption' => $imagesCaptionEn[$key],
-                        'language' => 'en',
-                    ],
-                    [
-                        'caption' => $imagesCaptionNl[$key],
-                        'language' => 'nl',
-                    ],
-                ],
-            ];
-        }
-    
-        $this->checkValidation($imagesData);
-    
+    public function createImages($imagesData, $monument)
+    {    
         foreach ($imagesData as $imageData) {
+            $this->checkValidation($imagesData);
+
             $image = $monument->images()->create(['url' => $imageData['url']]);
-    
-            $this->getOrCreateImageTranslations($imageData['translations'], $image);
+            
+            $this->_imageLanguageService->getOrCreateImageLanguage($imageData['translations'], $image);
         }
-    }    
+    }  
 
     public function deleteImages($monumentId)
     {
         $this->_model->where('monument_id', $monumentId)->delete();
-    }
-
-    protected function getOrCreateImageTranslations($translations, $image)
-    {
-        foreach ($translations as $translation) {
-            $this->_imageLanguageService->getOrCreateImageLanguage($translation, $image);
-        }
     }
 }
