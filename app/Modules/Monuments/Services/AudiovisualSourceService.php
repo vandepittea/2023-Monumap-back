@@ -13,12 +13,12 @@ class AudioVisualSourceService extends Service
         'type' => 'required|string|in:audio,video',
     ];
 
-    protected $audioVisualSourceLanguageService;
+    protected $_audioVisualSourceLanguageService;
 
     public function __construct(AudiovisualSource $model, AudioVisualSourceLanguageService $audioVisualSourceLanguageService)
     {
         parent::__construct($model);
-        $this->audioVisualSourceLanguageService = $audioVisualSourceLanguageService;
+        $this->_audioVisualSourceLanguageService = $audioVisualSourceLanguageService;
     }
 
     public function getOrCreateAudiovisualSource($audiovisualSourceData, $monument)
@@ -50,7 +50,7 @@ class AudioVisualSourceService extends Service
     protected function getOrCreateAudiovisualSourceTranslations($audiovisualSource, $translations)
     {
         foreach ($translations as $translationData) {
-            $this->audioVisualSourceLanguageService->getOrCreateAudiovisualSourceLanguage($translationData, $audiovisualSource);
+            $this->_audioVisualSourceLanguageService->getOrCreateAudiovisualSourceLanguage($translationData, $audiovisualSource);
         }
     }
 }

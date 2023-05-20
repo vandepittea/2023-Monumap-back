@@ -13,43 +13,43 @@ class ImageService extends Service
         'images.*.monument_id' => 'required|numeric'
     ];
 
-    protected $imageLanguageService;
+    protected $_imageLanguageService;
 
     public function __construct(Image $model, ImageLanguageService $imageLanguageService)
     {
         parent::__construct($model);
-        $this->imageLanguageService = $imageLanguageService;
+        $this->_imageLanguageService = $imageLanguageService;
     }
 
-    public function createImages($imagesUrl, $imagesCaption, $monument)
+    public function createImages($imagesUrl, $imagesCaptionEn, $imagesCaptionNl, $monument)
     {
         $imagesData = [];
-
+    
         foreach ($imagesUrl as $key => $image) {
             $imagesData[] = [
                 'url' => $image,
                 'monument_id' => $monument->id,
                 'translations' => [
                     [
-                        'caption' => $imagesCaption['en'][$key],
+                        'caption' => $imagesCaptionEn[$key],
                         'language' => 'en',
                     ],
                     [
-                        'caption' => $imagesCaption['nl'][$key],
+                        'caption' => $imagesCaptionNl[$key],
                         'language' => 'nl',
                     ],
                 ],
             ];
         }
-
+    
         $this->checkValidation($imagesData);
-
+    
         foreach ($imagesData as $imageData) {
             $image = $monument->images()->create(['url' => $imageData['url']]);
-
+    
             $this->getOrCreateImageTranslations($imageData['translations'], $image);
         }
-    }
+    }    
 
     public function deleteImages($monumentId)
     {
@@ -59,7 +59,7 @@ class ImageService extends Service
     protected function getOrCreateImageTranslations($translations, $image)
     {
         foreach ($translations as $translation) {
-            $this->imageLanguageService->getOrCreateImageLanguage($translation, $image);
+            $this->_imageLanguageService->getOrCreateImageLanguage($translation, $image);
         }
     }
 }

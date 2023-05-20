@@ -2,6 +2,7 @@
 namespace App\Modules\Monuments\Services;
 
 use App\Models\Monument;
+use Illuminate\Database\Eloquent\Model;
 use App\Modules\Core\Services\Service;
 use App\Modules\Monuments\Services\LocationService;
 use App\Modules\Monuments\Services\DimensionService;
@@ -36,13 +37,13 @@ class MonumentService extends Service
         private $_monumentLanguageService;
         private $_imageService;
 
-        public function __construct(Monument $model, LocationService $locationService, DimensionService $dimensionService, AudiovisualSourceService $audiovisualSourceService ,ImageService $imageService) {
+        public function __construct(Monument $model, LocationService $locationService, DimensionService $dimensionService, AudiovisualSourceService $audiovisualSourceService ,ImageService $imageService, MonumentLanguageService $monumentLanguageService) {
             Parent::__construct($model);
             $this->_locationService = $locationService;
             $this->_dimensionService = $dimensionService;
             $this->_audiovisualSourceService = $audiovisualSourceService;
-            $this -> _monumentLanguageService = new MonumentLanguageService(new MonumentLanguage()); //TODO: is dit correct??
             $this->_imageService = $imageService;
+            $this->_monumentLanguageService = $monumentLanguageService;
         }
 
         public function getAllMonuments($pages, $type = null, $year = null, $designer = null, $cost = null, $language = null)
@@ -80,31 +81,24 @@ class MonumentService extends Service
         {
             $this->checkValidation($data);
 
-            $name = $data['monuments_language']["name"];
-
-            $this->checkIfMonumentAlreadyExists($name);
+            $this->checkIfMonumentAlreadyExists('en', $data['language']['name']);
+        
             DB::beginTransaction();
         
             try {
                 $location = $this->_locationService->getOrCreateLocation($data['location']);
         
                 $monumentData = $this->getMonumentData($data, $location->id);
-
                 $monument = $this->createMonument($monumentData);
         
                 if (isset($data['dimensions'])) {
                     $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
-                    
                 }
                 if (isset($data['audiovisual_source'])) {
                     $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
                 }
-
-                if (isset($data['monuments_language'])){
-                    $this->_monumentLanguageService->getOrCreateMonumentLanguage($data['monuments_language'], $monument);
-                }
                 
-                $this->_imageService->createImages($data['images']['urls'], $data['images']['captions'], $monument);
+                $this->_imageService->createImages($data['images']['urls'], $data['images']['captions']['en'], $data['images']['captions']['nl'], $monument);
         
                 DB::commit();
         
@@ -154,9 +148,7 @@ class MonumentService extends Service
                 $newLocation = $this->_locationService->getOrCreateLocation($data['location']);
             
                 $monumentData = $this->getMonumentData($data, $newLocation->id);
-                $monumentLanguageData = $this -> getMonumentLanguageData($data, $monument->id); //TODO: is dit oke? 
-                $this->updateMonumentData($monument, $monumentData);
-                $this->updateMonumentLanguageData($monument, $monumentLanguageData); 
+                $this->updateMonumentData($monument, $monumentData); 
 
                 if (isset($data['dimensions'])) {
                     $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
@@ -166,7 +158,7 @@ class MonumentService extends Service
                 }
     
                 $this->_imageService->deleteImages($id);
-                $this->_imageService->createImages($data['images']['urls'], $data['images']['captions'], $monument);
+                $this->_imageService->createImages($data['images']['urls'], $data['images']['captions']['en'], $data['images']['captions']['nl'], $monument);
 
                 $this->_locationService->deleteUnusedLocations($oldLocationId);
                 $this->_dimensionService->deleteUnusedDimensions($oldDimensionsId);
@@ -199,53 +191,41 @@ class MonumentService extends Service
             $this->_model->destroy($ids);
         }                          
         
-        private function getMonumentData($data, $locationId)  
+        private function getMonumentData($data, $locationId)
         {
             $monumentData = array_intersect_key($data, array_flip([
-                'year_of_construction',
-                'monument_designer',
-                'weight',
-                'cost_to_construct',
-            ]));
-            
-            $monumentData['location_id'] = $locationId;
-
-            return $monumentData;
-        }
-
-        private function getMonumentLanguageData($data, $monumentId)
-        {
-            $monumentLanguageData = array_intersect_key($data, array_flip([
                 'name',
                 'description',
                 'historical_significance',
                 'type',
+                'year_of_construction',
+                'monument_designer',
                 'accessibility',
                 'used_materials',
+                'weight',
+                'cost_to_construct',
                 'language'
             ]));
-
-            $monumentLanguageData['monument_id'] = $monumentId;
-
-            return $monumentLanguageData;
+        
+            $monumentData['location_id'] = $locationId;
+        
+            return $monumentData;
         }
         
         private function createMonument($monumentData)
         {
-            return $this->_model->create($monumentData);
+            $monument = $this->_model->create($monumentData);
+            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['language'], $monument);
+            return $monument;
         }        
         
         private function updateMonumentData($monument, $monumentData) {
             $monument->update($monumentData);
-        } 
-        
-        private function updateMonumentLanguageData($monument, $monumentLanguageData) {
-            $monument->update($monumentLanguageData);
+            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['language'], $monument);
         }
         
         private function checkIfMonumentExists($id){
             $monument = $this->_model->find($id);
-
             if (!$monument) {
                 throw new NotFoundException('Monument not found.');
             }
@@ -253,10 +233,12 @@ class MonumentService extends Service
             return $monument;
         }
 
-        private function checkIfMonumentAlreadyExists($name){
-            $monument = $this->_model->whereHas('monumentLanguage', function($query) use ($name) {
-            $query->where('name', $name);
+        private function checkIfMonumentAlreadyExists($language, $name)
+        {
+            $monument = $this->_model->whereHas('monumentLanguage', function ($query) use ($language, $name) {
+                $query->where('language', $language)->where('name', $name);
             })->first();
+
             if ($monument) {
                 throw new AlreadyExistsException('Monument already exists.');
             }
