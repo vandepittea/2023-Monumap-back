@@ -6,7 +6,7 @@ use App\Modules\Core\Services\ServiceLanguages;
 
 class MonumentLanguageService extends ServiceLanguages
 {
-    protected $_rulesTranslations = [
+    protected $_rules = [
         'name' => 'required|string|max:50',
         'description' => 'required|string',
         'historical_significance' => 'nullable|string',

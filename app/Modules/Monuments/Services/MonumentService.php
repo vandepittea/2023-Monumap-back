@@ -77,7 +77,7 @@ class MonumentService extends Service
 
         public function addMonument($data)
         {
-            $this->checkValidation($data);
+            $this->validate($data);
 
             $this->checkIfMonumentAlreadyExists('en', $data['translations']);
         
@@ -134,7 +134,7 @@ class MonumentService extends Service
 
         public function updateMonument($id, $data)
         {
-            $this->checkValidation($data); 
+            $this->validate($data); 
 
             $monument = $this->checkIfMonumentExists($id);
 

@@ -7,19 +7,10 @@ use Illuminate\Validation\ValidationException;
 
 abstract class ServiceLanguages extends Service
 {
-    protected $_rulesTranslations = [];
-
-
     protected function validate($data)
     {
-        $this->validateDataTranslations($data);
-        parent::validate($data);
-    }
-
-    private function validateDataTranslations($data)
-    {
         foreach ($data as $translation) {
-            $validator = Validator::make($translation, $this->_rulesTranslations);
+            $validator = Validator::make($translation, $this->_rules);
             if ($validator->fails()) {
                 throw new ValidationException($validator);
             }

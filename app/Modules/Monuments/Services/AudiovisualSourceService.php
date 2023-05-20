@@ -23,7 +23,7 @@ class AudioVisualSourceService extends Service
 
     public function getOrCreateAudiovisualSource($audiovisualSourceData, $monument)
     {
-        $this->checkValidation($audiovisualSourceData);
+        $this->validate($audiovisualSourceData);
 
         $audiovisualSourceResult = array_filter([
             'url' => $audiovisualSourceData['url'],

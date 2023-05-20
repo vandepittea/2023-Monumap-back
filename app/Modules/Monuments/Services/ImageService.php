@@ -23,7 +23,7 @@ class ImageService extends Service
     public function createImages($imagesData, $monument)
     {    
         foreach ($imagesData as $imageData) {
-            $this->checkValidation($imagesData);
+            $this->validate($imagesData);
 
             $image = $monument->images()->create(['url' => $imageData['url']]);
             

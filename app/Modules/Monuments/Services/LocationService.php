@@ -20,7 +20,7 @@ class LocationService extends Service
         
         public function getOrCreateLocation($locationData)
         {
-            $this->checkValidation($locationData);
+            $this->validate($locationData);
 
             $location = $this->_model->firstOrCreate(
                 [
