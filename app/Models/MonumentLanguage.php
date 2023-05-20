@@ -12,6 +12,7 @@ class MonumentLanguage extends Model
     protected $table = "monuments_language";
 
     protected $fillable = [
+        'monument_id',
         'name',
         'description',
         'historical_significance',

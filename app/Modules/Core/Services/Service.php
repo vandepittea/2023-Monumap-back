@@ -45,5 +45,4 @@ class Service {
     public function getErrors(){
         return $this->_errors;
     }
-
 }

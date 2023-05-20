@@ -2,90 +2,43 @@
 
 namespace App\Modules\Core\Services;
 
-use Exception;
-use Hamcrest\Core\HasToString;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\MessageBag;
-use Illuminate\Support\Facades\Log; //TODO: remove
 
 abstract class ServiceLanguages extends Service
 {
     protected $_rulesTranslations = [];
 
 
-    // -- VALIDATOR --> REFACTOR --
     protected function validate($data)
-    {   
-        $translationData = isset($data["monuments_language"]) ? $data["monuments_language"] : null;  
-        //$array = json_decode($data["monuments_language"], true); // Decode the JSON string into an associative $arrayName = array('' => , );
-
-        $this->validateData($data); 
-
-          if ($translationData != null) {
-            $this->validateDataTranslations($data);
-            }
-     }
-
-    private function validateData($data, $rules = null)
     {
-        if ($rules == null){
-            $rules = $this->_rules;
-        }
-
-        $validator = Validator::make($data, $rules);
-
-
-        $this->_errors = $validator->errors(); // Initialize the _errors object
-
-        if ($validator->fails()) {   
-            $this->_errors->merge($validator->errors());
-            return;
-        }
+        parent::validate($data);
+        $this->validateDataTranslations($data);
     }
 
     private function validateDataTranslations($data)
     {
         foreach ($data as $translation) {
-            $this->validateData($data, $this->_rulesTranslations);
+            $validator = Validator::make($translation, $this->_rulesTranslations);
+            if ($validator->fails()) {
+                $this->_errors->merge($validator->errors());
+            }
         }
     }
 
-    // -- PRESENTERS --> REFACTOR --
-    protected function presentAllWithTranslations($data) //TODO: toont nu jusite vertaling? 
+    protected function modelWithTranslations($model, $translationsField, $language = null)
     {
-      /* foreach ($data["data"] as $record) { //TODO: terugzetten
-       $data["data"] = $this->presentFindWithTranslations($record);
-        }*/
-        return $data;
-    }
+        $modelData = $model->toArray();
 
-    protected function presentFindWithTranslations($data)
-    {
-        if (!isset($data["translations"]))
-            return $data;
+        $translations = $model->$translationsField->groupBy('language')->toArray();
 
-        $translations = [];
-        foreach ($data["translations"] as  $translation) {
-            $translations[$translation["language"]] = $translation;
+        if ($language) {
+            $filteredTranslations = $translations[$language] ?? [];
+            $modelData[$translationsField] = $filteredTranslations;
+        } else {
+            $modelData[$translationsField] = $translations;
         }
-        $data["translations"] = $translations;
 
-        return $data;
-    }
-
-    // protected function presentDetailWithTranslations($data)
-    // {
-    //     return (count($data["translations"])) ? $data["translations"][0] : null;
-    // }
-
-    // protected function presentListWithTranslations($data) //TODO: verwijderen!
-    // {
-    //     foreach ($data["data"] as $index => $record) {
-    //         $data["data"][$index]["translations"] = $this->presentDetailWithTranslations($record);
-    //     }
-
-    //     return $data;
-    // }
-   
+        return $modelData;
+    }   
 }
 
