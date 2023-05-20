@@ -20,10 +20,10 @@ class AudiovisualSource extends Model
 
     public function monument()
     {
-        return $this->hasMany(Monument::class); //TODO: check if this is correct
+        return $this->hasMany(Monument::class);
     }
 
     public function audiovisualSourceLanguage(){
-        return $this->hasMany(AudiovisualSourceLanguage::class, 'audiovisual_source_id', 'id');
+        return $this->hasMany(AudioSourceLanguage::class, 'audiovisual_source_id', 'id');
     }
 }

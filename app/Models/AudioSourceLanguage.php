@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AudioSourceLanguage extends Model
 {
     use HasFactory;
+
     protected $table = "audiovisual_sources_language";
 
     protected $fillable = [
@@ -15,4 +16,10 @@ class AudioSourceLanguage extends Model
         'title',
         'language'
     ];
+
+    public function audiovisualSource()
+    {
+        return $this->belongsTo(AudiovisualSource::class, 'audiovisual_source_id', 'id');
+    }    
 }
+

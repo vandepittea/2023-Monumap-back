@@ -27,8 +27,7 @@ class DimensionService extends Service
                 'depth' => $dimensionsData['depth']
             ];
         
-            //$monument->dimensions()->create($dimensionData);
-            return $monument->dimensions()->create($dimensionData); //TODO: goed zo?
+            $monument->dimensions()->create($dimensionData);
         }        
         
         public function deleteUnusedDimensions($oldDimensionsId) {

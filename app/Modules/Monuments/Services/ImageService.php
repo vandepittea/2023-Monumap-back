@@ -1,43 +1,65 @@
 <?php
+
 namespace App\Modules\Monuments\Services;
 
 use App\Modules\Core\Services\Service;
-use Illuminate\Validation\Rule;
+use App\Modules\Monuments\Services\ImageLanguageService;
 use App\Models\Image;
-use Illuminate\Support\Facades\Log;
 
 class ImageService extends Service
 {
-        protected $_rules = [
-            'images.*.url' => 'required|url',
-            'images.*.caption' => 'required|string|max:50',
-            'images.*.monument_id' => 'required|numeric'
-        ];    
+    protected $_rules = [
+        'images.*.url' => 'required|url',
+        'images.*.monument_id' => 'required|numeric'
+    ];
 
-        protected $_rulesTranslations = [
-            'images.*.caption' => 'required|string|max:50',
-        ];    
+    protected $_imageLanguageService;
 
-        public function __construct(Image $model) {
-            Parent::__construct($model);
-        }  
+    public function __construct(Image $model, ImageLanguageService $imageLanguageService)
+    {
+        parent::__construct($model);
+        $this->_imageLanguageService = $imageLanguageService;
+    }
 
-        public function createImages($imagesUrl, $imagesCaption, $monument)
-        {            
-            foreach ($imagesUrl as $key => $image) {
-                $imagesData[] = [
-                    'url' => $image,
-                    'captions' => $imagesCaption[$key],
-                    'monument_id' => $monument->id
-                ];
-
-                $this->checkValidation($imagesData);
-            }
-            
-            $monument->images()->createMany($imagesData);
+    public function createImages($imagesUrl, $imagesCaptionEn, $imagesCaptionNl, $monument)
+    {
+        $imagesData = [];
+    
+        foreach ($imagesUrl as $key => $image) {
+            $imagesData[] = [
+                'url' => $image,
+                'monument_id' => $monument->id,
+                'translations' => [
+                    [
+                        'caption' => $imagesCaptionEn[$key],
+                        'language' => 'en',
+                    ],
+                    [
+                        'caption' => $imagesCaptionNl[$key],
+                        'language' => 'nl',
+                    ],
+                ],
+            ];
         }
+    
+        $this->checkValidation($imagesData);
+    
+        foreach ($imagesData as $imageData) {
+            $image = $monument->images()->create(['url' => $imageData['url']]);
+    
+            $this->getOrCreateImageTranslations($imageData['translations'], $image);
+        }
+    }    
 
-        public function deleteImages($id) {
-            $this->_model->where('monument_id', $id)->delete();
-        }     
+    public function deleteImages($monumentId)
+    {
+        $this->_model->where('monument_id', $monumentId)->delete();
+    }
+
+    protected function getOrCreateImageTranslations($translations, $image)
+    {
+        foreach ($translations as $translation) {
+            $this->_imageLanguageService->getOrCreateImageLanguage($translation, $image);
+        }
+    }
 }

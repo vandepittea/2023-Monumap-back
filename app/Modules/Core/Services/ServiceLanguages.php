@@ -11,8 +11,8 @@ abstract class ServiceLanguages extends Service
 
     protected function validate($data)
     {
-        parent::validate($data);
         $this->validateDataTranslations($data);
+        parent::validate($data);
     }
 
     private function validateDataTranslations($data)
@@ -41,4 +41,3 @@ abstract class ServiceLanguages extends Service
         return $modelData;
     }   
 }
-
