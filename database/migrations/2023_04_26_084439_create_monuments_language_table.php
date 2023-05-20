@@ -45,19 +45,19 @@ return new class extends Migration
                         'Herdenkingen voor historische gebeurtenissen',
                         'Natuurmonumenten,Graven en Mausolea'
                     ]);
-                    $table->enum('accessibility', [
+            $table->set('accessibility', [
                         'wheelchair-friendly',
                         'near parking areas',
                         'low-slope ramps',
                         'power-assisted doors',
-                        'elevators', 
+                        'elevators',
                         'accessible washrooms',
                         'rolstoelvriendelijk',
                         'dichtbij parkeerplaatsen',
                         'hellingen met lage helling',
                         'elektrisch bediende deuren',
-                        'liften, toegankelijke toiletten',
-                    ])->nullable();
+                        'liften en toegankelijke toiletten',
+            ])->nullable();
             $table->json('used_materials')->nullable();
             $table->timestamps();
         });

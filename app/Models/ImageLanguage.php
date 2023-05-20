@@ -13,10 +13,12 @@ class ImageLanguage extends Model
 
     protected $fillable = [
         'image_id',
-        'caption'
+        'caption',
+        'language'
     ];
 
-    public function imageLanguage(){
-        return $this->hasMany(ImageLanguage::class, 'image_id', 'id');
+    public function image()
+    {
+        return $this->belongsTo(Image::class, "image_id", "id");
     }
 }
