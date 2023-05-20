@@ -30,9 +30,4 @@ class AudiovisualSourceLanguageService extends ServiceLanguages
 
         return $audiovisualSourceLanguage;
     }
-
-    public function deleteTranslations($audiovisualSource)
-    {
-        $audiovisualSource->audiovisualSourceLanguage()->delete();
-    }
 }

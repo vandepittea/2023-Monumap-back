@@ -20,7 +20,7 @@ class AudiovisualSource extends Model
 
     public function monument()
     {
-        return $this->hasMany(Monument::class); //TODO: check if this is correct
+        return $this->belongsTo(Monument::class);
     }
 
     public function audiovisualSourceLanguage(){

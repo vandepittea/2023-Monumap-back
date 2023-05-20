@@ -40,15 +40,10 @@ class AudioVisualSourceService extends Service
     public function deleteUnusedAudiovisualSources($oldAudiovisualSourceId)
     {
         if ($oldAudiovisualSourceId) {
-            $unusedAudiovisualSource = $this->_model
+            $this->_model
                 ->where('id', $oldAudiovisualSourceId)
                 ->whereDoesntHave('monuments')
                 ->first();
-    
-            if ($unusedAudiovisualSource) {
-                $this->audioVisualSourceLanguageService->deleteTranslations($unusedAudiovisualSource);
-                $unusedAudiovisualSource->delete();
-            }
         }
     }    
 

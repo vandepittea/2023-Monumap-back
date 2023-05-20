@@ -6,7 +6,7 @@ use App\Modules\Core\Services\ServiceLanguages;
 use Illuminate\Support\Facades\Log;
 
 
-class MonumentLanguageService extends ServiceLanguages { //TODO: moet ik hier extenden van ServiceLanguages? 
+class MonumentLanguageService extends ServiceLanguages {
     protected $_rulesTranslations = [
         'name' => 'required|string|max:50',
         'description' => 'required|string',
