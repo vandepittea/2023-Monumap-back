@@ -16,9 +16,9 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::post('monuments/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register']);
 
-Route::post('monuments/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function() {
     Route::post('/monuments', [MonumentApiController::class, 'addMonument']);

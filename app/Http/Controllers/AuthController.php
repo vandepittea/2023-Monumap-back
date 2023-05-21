@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Modules\Users\Services\UserService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 
 class AuthController extends Controller
@@ -22,11 +21,11 @@ class AuthController extends Controller
         try {
             $this->userService->registerUser($request->all());
         } catch (\Exception $e) {
-            //TODO: goede error teruggeven
+            
             return response()->json(['error' => $e->getMessage()], 400);
         }
          
-        return response()->noContent();
+        return response()->json(['message' => 'User registered.']);
     }
 
     public function login(Request$request){

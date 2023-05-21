@@ -4,7 +4,6 @@ namespace App\Modules\Users\Services;
 use App\Models\User;
 use App\Modules\Core\Services\Service;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class UserService extends Service

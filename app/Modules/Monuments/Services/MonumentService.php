@@ -15,7 +15,6 @@ use App\Models\AudioSourceLanguage;
 use App\Models\AudiovisualSource;
 use App\Models\ImageLanguage;
 use App\Models\Image;
-use Illuminate\Support\Facades\Log;
 
 class MonumentService extends Service
 {
