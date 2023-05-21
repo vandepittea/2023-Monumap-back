@@ -31,6 +31,27 @@ class MonumentService extends Service
             'audiovisual_source' => 'nullable',
             'audiovisual_source.audiovisual_source_language' => 'nullable|array|min:2',
             'monument_language' => 'required|array|min:2',
+            'monument_language.*.name' => 'required|string|max:50',
+            'monument_language.*.description' => 'required|string',
+            'monument_language.*.historical_significance' => 'nullable|string',
+            'monument_language.*.type' => 'required|string|in:War Memorials,Statues and Sculptures,Historical Buildings and Sites,National Monuments,Archaeological Sites and Cultural and Religious Monuments,Public Art Installations,Memorials for Historical Events,Natural Monuments,Tombs and Mausoleums,Oorlogsmonumenten,Beelden en Sculpturen,Historische Gebouwen en Plaatsen,Nationale Monumenten,Archeologische Plaatsen,Culturele en Religieuze Monumenten,Openbare Kunstinstallaties,Gedenktekens voor Historische Evenementen,Natuurmonumenten en Graven en Mausoleums',
+            'monument_language.*.accessibility' => 'nullable|array|in:wheelchair-friendly,near parking areas,low-slope ramps,power-assisted doors and elevators,accessible washrooms,rolstoelvriendelijk,in de buurt van parkeerterreinen,laaghellende opritten,elektrisch ondersteunde deuren en liften,toegankelijke toiletten',
+            'monument_language.*.used_materials' => 'nullable|array',
+            'monument_language.*.language' => 'required|string|in:English,Dutch',
+            'location.latitude' => 'required|numeric|between:-90,90',
+            'location.longitude' => 'required|numeric|between:-180,180',
+            'location.street' => 'nullable|string|max:50',
+            'location.number' => 'nullable|numeric|max:99999',
+            'location.city' => 'required|string|max:50',
+            'images.*.url' => 'required|url',
+            'images.*.image_language.*.caption' => 'required|string|max:50',
+            'dimensions.height' => 'nullable|numeric',
+            'dimensions.width' => 'nullable|numeric',
+            'dimensions.depth' => 'nullable|numeric',
+            'audiovisual_source.url' => 'nullable|url',
+            'audiovisual_source.type' => 'nullable|string|in:audio,video',
+            'audiovisual_source.*.title' => 'nullable|string',
+            'audiovisual_source.*.language' => 'nullable|string'
         ];    
 
         private $_locationService;
