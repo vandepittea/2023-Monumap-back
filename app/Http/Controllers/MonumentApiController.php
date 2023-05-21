@@ -7,6 +7,7 @@ use App\Modules\Monuments\Services\MonumentService;
 use App\Exceptions\AlreadyExistsException;
 use App\Exceptions\NotFoundException;
 use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 class MonumentApiController extends Controller
 {
@@ -101,9 +102,19 @@ class MonumentApiController extends Controller
         }
     }
 
-    public function deleteMultipleMonuments($ids)
+    public function deleteMultipleMonuments(Request $request)
     {
+        $ids = $request->input('ids');
+
         try {
+            if (!is_array($ids)) {
+                throw new InvalidArgumentException('Invalid parameter. $ids must be an array.');
+            }
+        
+            if (empty($ids)) {
+                throw new InvalidArgumentException('Invalid parameter. $ids array cannot be empty.');
+            }
+
             $this->_service->deleteMultipleMonuments($ids);
 
             return response()->json([
@@ -113,6 +124,10 @@ class MonumentApiController extends Controller
             return response()->json([
                 'message' => $e->getMessage()
             ], $e->getStatus());
-        }
+        } catch (InvalidArgumentException $e) {
+        return response()->json([
+            'message' => $e->getMessage()
+        ], 400);
+    }
     }      
 }

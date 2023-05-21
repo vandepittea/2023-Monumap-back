@@ -35,16 +35,17 @@ return new class extends Migration
                         'Cultural and Religious Monuments',
                         'Public Art Installations',
                         'Memorials for Historical Events',
-                        'Natural Monuments,Tombs and Mausoleums', 
+                        'Natural Monuments',
+                        'Tombs and Mausoleums', 
                         'Oorlogsmonumenten',
                         'Beelden en sculpturen',
-                        'Historische gebouwen en plaatsen',
+                        'Historische Gebouwen en Plaatsen',
                         'Nationale Monumenten',
-                        'Archeologische sites',
-                        'Culturele en religieuze monumenten',
+                        'Archeologische Plaatsen',
+                        'Culturele en Religieuze Monumenten',
                         'Openbare Kunstinstallaties',
-                        'Herdenkingen voor historische gebeurtenissen',
-                        'Natuurmonumenten,Graven en Mausolea'
+                        'Gedenktekens voor Historische Evenementen',
+                        'Natuurmonumenten en Graven en Mausoleums'
                     ]);
             $table->json('accessibility')->nullable();
             $table->json('used_materials')->nullable();

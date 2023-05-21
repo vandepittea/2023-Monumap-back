@@ -2,15 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Monument;
-use App\Models\Location;
-use App\Models\Dimension;
-use App\Models\Image;
-use App\Models\AudiovisualSource;
 use App\Modules\Monuments\Services\MonumentService;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MonumentSeeder extends Seeder
 {
@@ -27,6 +21,8 @@ class MonumentSeeder extends Seeder
         $file = fopen(storage_path('app/data/csv/monuments.csv'), 'r');
         $header = fgetcsv($file);
         $monuments = $this->parseMonuments($file, $header);
+        $jsonMonuments = json_encode($monuments, JSON_PRETTY_PRINT);
+        Log::info($jsonMonuments);
         fclose($file);
     
         $this->_service->addMultipleMonuments($monuments);
@@ -40,43 +36,140 @@ class MonumentSeeder extends Seeder
             $data = array_combine($header, $data);
 
             $monumentData = [
-                'name' => $data['name'],
-                'description' => $data['description'],
+                'year_of_construction' => (int) $data['year_of_construction'],
+                'monument_designer' => $data['monument_designer'],
+                'weight' => (int) $data['weight'],
+                'cost_to_construct' => (float) $data['cost_to_construct'],
                 'location' => [
-                    'latitude' => $data['latitude'],
-                    'longitude' => $data['longitude'],
-                    'street' => $data['street'] ?: null,
-                    'number' => $data['number'] ?: null,
+                    'latitude' => (float) $data['latitude'],
+                    'longitude' => (float) $data['longitude'],
+                    'street' => $data['street'],
+                    'number' => (int) $data['number'],
                     'city' => $data['city'],
                 ],
-                'historical_significance' => $data['historical_significance'] ?: null,
-                'type' => $data['type'],
-                'year_of_construction' => $data['year_of_construction'],
-                'monument_designer' => $data['monument_designer'],
-                'accessibility' => explode(",",$data['accessibility']),
-                'used_materials' => explode(",",$data['used_materials']),
-                'dimensions' => [
-                    'height' => $data['height'],
-                    'width' => $data['width'],
-                    'depth' => $data['depth'],
-                ],
-                'weight' => $data['weight'] ?: null,
-                'cost_to_construct' => $data['cost_to_construct'] ?: null,
-                'images' => [
-                    'urls' => explode(",",$data['images_urls']),
-                    'captions' => explode(",",$data['images_captions']),
-                ],
-                'audiovisual_source' => [
-                    'title' => $data['audiovisual_source_title'],
-                    'url' => $data['audiovisual_source_url'],
-                    'type' => $data['audiovisual_source_type'],
-                ],
-                'language' => $data['language'],
+                'dimensions' => $this->parseDimensions($data),
+                'images' => $this->parseImages($data),
+                'audiovisual_source' => $this->parseAudiovisualSource($data),
+                'monument_language' => $this->parseMonumentLanguage($data),
             ];
 
             $monuments[] = $monumentData;
         }
 
         return $monuments;
+    }
+
+    protected function parseDimensions($data)
+    {
+        $height = (float) $data['height'];
+        $width = (float) $data['width'];
+        $depth = (float) $data['depth'];
+
+        if ($height == null && $width == null && $depth == null) {
+            return null;
+        }
+
+        return (object) [
+            'height' => $height,
+            'width' => $width,
+            'depth' => $depth,
+        ];
+    }
+
+    protected function parseImages($data)
+    {
+        $images = [];
+
+        $imageUrlKey = "images_url";
+        $captionDutchKey = "captions_dutch";
+        $captionEnglishKey = "captions_english";
+
+        $imageUrls = explode(',', $data[$imageUrlKey]);
+        $captionsDutch = explode(',', $data[$captionDutchKey]);
+        $captionsEnglish = explode(',', $data[$captionEnglishKey]);
+
+        foreach ($imageUrls as $index => $imageUrl) {
+            $imageUrl = trim($imageUrl);
+            $captionDutch = trim($captionsDutch[$index] ?? '');
+            $captionEnglish = trim($captionsEnglish[$index] ?? '');
+
+            if (!empty($imageUrl)) {
+                $image = [
+                    'url' => $imageUrl,
+                    'image_language' => [
+                        [
+                            'caption' => $captionDutch,
+                            'language' => 'Dutch',
+                        ],
+                        [
+                            'caption' => $captionEnglish,
+                            'language' => 'English',
+                        ],
+                    ],
+                ];
+
+                $images[] = $image;
+            }
+        }
+
+        return $images;
+    }           
+
+    protected function parseAudiovisualSource($data)
+    {
+        if (empty($data['audiovisual_source_url']) && empty($data['audiovisual_source_type']) && empty($data['audiovisual_source_language_title_dutch']) && empty($data['audiovisual_source_language_title_english'])) {
+            return null;
+        }
+
+        return [
+            'url' => $data['audiovisual_source_url'],
+            'type' => $data['audiovisual_source_type'],
+            'audiovisual_source_language' => [
+                [
+                    'title' => $data['audiovisual_source_language_title_dutch'],
+                    'language' => 'Dutch',
+                ],
+                [
+                    'title' => $data['audiovisual_source_language_title_english'],
+                    'language' => 'English',
+                ],
+            ],
+        ];
+    }
+
+    protected function parseAccessibility($data, $language)
+    {
+        $accessibilityKey = "monument_language_accessibility_{$language}";
+        return explode(',', $data[$accessibilityKey]);
+    }
+
+    protected function parseUsedMaterials($data, $language)
+    {
+        $usedMaterialsKey = "monument_language_used_materials_{$language}";
+        return explode(',', $data[$usedMaterialsKey]);
+    }
+
+    protected function parseMonumentLanguage($data)
+    {
+        return [
+            [
+                'language' => 'Dutch',
+                'name' => $data['monument_language_name_dutch'],
+                'description' => $data['monument_language_description_dutch'],
+                'historical_significance' => $data['monument_language_historical_significance_dutch'],
+                'type' => $data['monument_language_type_dutch'],
+                'accessibility' => $this->parseAccessibility($data, 'dutch'),
+                'used_materials' => $this->parseUsedMaterials($data, 'dutch'),
+            ],
+           [
+                'language' => 'English',
+                'name' => $data['monument_language_name_english'],
+                'description' => $data['monument_language_description_english'],
+                'historical_significance' => $data['monument_language_historical_significance_english'],
+                'type' => $data['monument_language_type_english'],
+                'accessibility' => $this->parseAccessibility($data, 'english'),
+                'used_materials' => $this->parseUsedMaterials($data, 'english'),
+            ],
+        ];
     }
 }

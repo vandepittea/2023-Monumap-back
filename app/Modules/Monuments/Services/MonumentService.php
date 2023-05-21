@@ -235,11 +235,11 @@ class MonumentService extends Service
 
         public function deleteMultipleMonuments($ids) {
             $monuments = $this->_model->whereIn('id', $ids)->get();
-        
+
             if ($monuments->count() !== count($ids)) {
                 throw new NotFoundException('One or more monuments not found.');
             }
-        
+
             $this->_model->destroy($ids);
 
             $this->_locationService->deleteUnusedObjects();

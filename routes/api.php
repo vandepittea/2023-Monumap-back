@@ -24,7 +24,7 @@ Route::middleware('auth:api')->group(function() {
     Route::post('/monuments', [MonumentApiController::class, 'addMonument']);
     Route::put('/monuments/{id}', [MonumentApiController::class, 'updateMonument']);
     Route::delete('/monuments/{id}', [MonumentApiController::class, 'deleteMonument']);
-    Route::delete('/monuments/{ids}', [MonumentApiController::class, 'deleteMultipleMonuments']);
+    Route::delete('/monuments', [MonumentApiController::class, 'deleteMultipleMonuments']);
 });
 
 Route::get('/monuments', [MonumentApiController::class, 'getAllMonuments']);
