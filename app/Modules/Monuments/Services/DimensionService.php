@@ -3,7 +3,6 @@ namespace App\Modules\Monuments\Services;
 
 use App\Modules\Core\Services\Service;
 use App\Models\Dimensions;
-use Illuminate\Support\Facades\Log;
 
 class DimensionService extends Service
 {
