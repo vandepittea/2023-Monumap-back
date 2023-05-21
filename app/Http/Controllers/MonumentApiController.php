@@ -49,9 +49,12 @@ class MonumentApiController extends Controller
         }
     }
 
-    public function getOneMonument($id) {
+    public function getOneMonument(Request $request) {
+        $id = $request->route('id');
+        $language = $request->query('language');
+
         try {
-            return $this->_service->getOneMonument($id);
+            return $this->_service->getOneMonument($id, $language);
         } catch (NotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage()

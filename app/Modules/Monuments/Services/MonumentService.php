@@ -15,6 +15,7 @@ use App\Models\AudioSourceLanguage;
 use App\Models\AudiovisualSource;
 use App\Models\ImageLanguage;
 use App\Models\Image;
+use Illuminate\Support\Facades\Log;
 
 class MonumentService extends Service
 {
@@ -138,12 +139,34 @@ class MonumentService extends Service
             }
         }
 
-        public function getOneMonument($id){
+        public function getOneMonument($id, $language)
+        {
             $monument = $this->checkIfMonumentExists($id);
             
-            $monument->load(['location', 'dimensions', 'images', 'audiovisualSource', 'MonumentLanguage', 'translationsSource', 'translationsImage']);
+            $monument->load([
+                'location',
+                'dimensions',
+                'images',               
+                'audiovisualSource',
+                'monumentLanguage' => function ($query) use ($language) {
+                    if ($language) {
+                        $query->where('language', $language);
+                    }
+                },
+                'images.imageLanguage' => function ($query) use ($language) {
+                    if ($language) {
+                        $query->where('language', $language);
+                    }
+                },
+                'audiovisualSource.audiovisualSourceLanguage' => function ($query) use ($language) {
+                    if ($language) {
+                        $query->where('language', $language);
+                    }
+                },
+            ]);
+        
             return ["data" => $monument];
-        }
+        }                             
 
         public function updateMonument($id, $data)
         {

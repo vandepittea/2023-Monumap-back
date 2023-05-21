@@ -16,20 +16,4 @@ abstract class ServiceLanguages extends Service
             }
         }
     }
-
-    protected function modelWithTranslations($model, $translationsField, $language = null)
-    {
-        $modelData = $model->toArray();
-
-        $translations = $model->$translationsField->groupBy('language')->toArray();
-
-        if ($language) {
-            $filteredTranslations = $translations[$language] ?? [];
-            $modelData[$translationsField] = $filteredTranslations;
-        } else {
-            $modelData[$translationsField] = $translations;
-        }
-
-        return $modelData;
-    }   
 }
