@@ -190,25 +190,23 @@ class MonumentService extends Service
 
             DB::beginTransaction();
 
-            try {
-                $oldLocationId = $monument->location_id;
-                $oldDimensionsId = $monument->dimensions_id;
-                $oldAudiovisualSourceId = $monument->audiovisual_source_id;
-            
+            try {            
                 $newLocation = $this->_locationService->getOrCreateLocation($data['location']);
             
                 $monumentData = $this->getMonumentData($data, $newLocation->id);
                 $this->updateMonumentData($monument, $monumentData); 
 
                 if (isset($data['dimensions'])) {
-                    $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    $dimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    $this->updateMonumentDimensions($monument, $dimensions);
                 }
                 if (isset($data['audiovisual_source'])) {
-                    $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                    $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                    $this->updateMonumentAudiovisualSource($monument, $audiovisualSource);
                 }
     
                 $this->_imageService->deleteImages($id);
-                $this->_imageService->createImages($data['images']['urls'], $data['images']['captions']['en'], $data['images']['captions']['nl'], $monument);
+                $this->_imageService->createImages($data['images'], $monument);
 
                 $this->_locationService->deleteUnusedObjects();
                 $this->_dimensionService->deleteUnusedObjects();
@@ -279,7 +277,7 @@ class MonumentService extends Service
         
         private function updateMonumentData($monument, $monumentData) {
             $monument->update($monumentData);
-            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['translations'], $monument);
+            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['monument_language'], $monument);
         }
         
         private function checkIfMonumentExists($id){
