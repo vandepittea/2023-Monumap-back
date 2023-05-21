@@ -226,9 +226,13 @@ class MonumentService extends Service
         public function deleteMonument($id) {
             $monument = $this->checkIfMonumentExists($id);
 
-            if($monument){
+            if($monument){                
                 $monument->delete();
             }
+
+            $this->_locationService->deleteUnusedLocations();
+            $this->_dimensionService->deleteUnusedDimensions();
+            $this->_audiovisualSourceService->deleteUnusedAudiovisualSources();
         }
 
         public function deleteMultipleMonuments($ids) {
@@ -239,6 +243,10 @@ class MonumentService extends Service
             }
         
             $this->_model->destroy($ids);
+
+            $this->_locationService->deleteUnusedLocations();
+            $this->_dimensionService->deleteUnusedDimensions();
+            $this->_audiovisualSourceService->deleteUnusedAudiovisualSources();
         }                          
         
         private function getMonumentData($data, $locationId)

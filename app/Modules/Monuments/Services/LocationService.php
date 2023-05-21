@@ -35,8 +35,7 @@ class LocationService extends Service
             return $location;
         }
         
-        public function deleteUnusedLocations($oldLocationId) {
-            if ($oldLocationId != null)
-            $this->_model->where('id', $oldLocationId)->whereDoesntHave('monuments')->delete();
-        }   
+        public function deleteUnusedLocations() {
+            $this->_model->doesntHave('monuments')->delete();
+        }          
 }

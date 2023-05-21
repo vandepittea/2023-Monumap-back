@@ -37,13 +37,8 @@ class AudioVisualSourceService extends Service
         return $audiovisualSource;
     }
 
-    public function deleteUnusedAudiovisualSources($oldAudiovisualSourceId)
+    public function deleteUnusedAudiovisualSources()
     {
-        if ($oldAudiovisualSourceId) {
-            $this->_model
-                ->where('id', $oldAudiovisualSourceId)
-                ->whereDoesntHave('monuments')
-                ->first();
-        }
+        $this->_model->doesntHave('monuments');
     }
 }

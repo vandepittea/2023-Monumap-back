@@ -18,7 +18,7 @@ class AudiovisualSource extends Model
         'type' => 'video'
     ];
 
-    public function monument()
+    public function monuments()
     {
         return $this->hasMany(Monument::class);
     }
