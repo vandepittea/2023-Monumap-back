@@ -49,11 +49,40 @@ class Monument extends Model
         return $query->where('year_of_construction', $year);
     }
     
-    public function scopeOfMonumentDesigner($query, $designer) {
-        return $query->where('monument_designer', $designer);
-    }
+    public function scopeOfMonumentDesigner($query, $designer)
+    {
+        return $query->where('monument_designer', 'LIKE', '%' . $designer . '%');
+    }    
 
     public function scopeOfCostToConstruct($query, $cost) {
         return $query->where('cost_to_construct', $cost);
+    }
+
+    public function scopeOfName($query, $name)
+    {
+        return $query->whereHas('monumentLanguage', function ($query) use ($name) {
+            $query->where('name', 'LIKE', "%$name%");
+        });
+    }
+
+    public function scopeOfType($query, $type)
+    {
+        return $query->whereHas('monumentLanguage', function ($query) use ($type) {
+            $query->where('type', $type);
+        });
+    }
+
+    public function scopeOfLanguage($query, $language)
+    {
+        return $query->whereHas('MonumentLanguage', function ($query) use ($language) {
+            $query->where('language', $language);
+        })->with(['images.imageLanguage' => function ($query) use ($language) {
+            $query->where('language', $language);
+        }, 'audiovisualSource.audiovisualSourceLanguage' => function ($query) use ($language) {
+            $query->where('language', $language);
+        },
+        'monumentLanguage' => function ($query) use ($language) {
+            $query->where('language', $language);
+        }]);
     }
 }

@@ -19,13 +19,18 @@ class MonumentApiController extends Controller
     public function getAllMonuments(Request $request) {
         $perPage = $request->get('perPage', 10);
         $page = $request->get('page', 1);
+        $name = $request->query('name');
         $type = $request->query('type');
         $year = $request->query('year');
         $designer = $request->query('designer');
         $cost = $request->query('cost');
         $language = $request->query('language');
+
+        $name = mb_strtolower($name, 'UTF-8');
+        $designer = mb_strtolower($designer, 'UTF-8');
+        $language = mb_strtolower($language, 'UTF-8');
     
-        return $this->_service->getAllMonuments($perPage, $page, $type, $year, $designer, $cost, $language);
+        return $this->_service->getAllMonuments($perPage, $page, $name, $type, $year, $designer, $cost, $language);
     }
 
     public function addMonument(Request $request)

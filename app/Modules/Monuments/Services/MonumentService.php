@@ -48,14 +48,16 @@ class MonumentService extends Service
             $this->_monumentLanguageService = new monumentLanguageService($model);
         }
 
-        public function getAllMonuments($perPage, $page, $type = null, $year = null, $designer = null, $cost = null, $language = null)
+        public function getAllMonuments($perPage, $page, $name = null, $type = null, $year = null, $designer = null, $cost = null, $language = null)
         {
             $query = $this->_model->with('location', 'dimensions', 'images', 'audiovisualSource', 'monumentLanguage', 'images.imageLanguage', 'audiovisualSource.audiovisualSourceLanguage');
 
+            if ($name) {
+                $query->OfName($name);
+            }
+
             if ($type) {
-                $query->whereHas('MonumentLanguage', function ($query) use ($type) {
-                    $query->where('type', $type);
-                });
+                $query->OfType($type);
             }    
 
             if ($year) {
@@ -71,16 +73,7 @@ class MonumentService extends Service
             }
 
             if ($language) {
-                $query->whereHas('MonumentLanguage', function ($query) use ($language) {
-                    $query->where('language', $language);
-                })->with(['images.imageLanguage' => function ($query) use ($language) {
-                    $query->where('language', $language);
-                }, 'audiovisualSource.audiovisualSourceLanguage' => function ($query) use ($language) {
-                    $query->where('language', $language);
-                },
-                'monumentLanguage' => function ($query) use ($language) {
-                    $query->where('language', $language);
-                }]);
+                $query->OfLanguage($language);
             }
                                        
             $paginator = $query->paginate($perPage, ['*'], 'page', $page)->appends(request()->query());
