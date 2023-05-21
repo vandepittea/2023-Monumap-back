@@ -37,9 +37,4 @@ class MonumentLanguageService extends ServiceLanguages
             );
         }
     }    
-
-    public function scopeOfType($query, $type)
-    {
-        return $query->where('type', $type);
-    }
 }

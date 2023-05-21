@@ -66,10 +66,19 @@ class MonumentService extends Service
                 $query->OfCostToConstruct($cost);
             }
 
-           /* if ($language) { //TODO: wegdoen
-                $query->OfLanguage($language);
-            }*/
-
+            if ($language) {
+                $query->whereHas('MonumentLanguage', function ($query) use ($language) {
+                    $query->where('language', $language);
+                })->with(['images.imageLanguage' => function ($query) use ($language) {
+                    $query->where('language', $language);
+                }, 'audiovisualSource.audiovisualSourceLanguage' => function ($query) use ($language) {
+                    $query->where('language', $language);
+                },
+                'monumentLanguage' => function ($query) use ($language) {
+                    $query->where('language', $language);
+                }]);
+            }
+                                       
             $paginator = $query->paginate($perPage, ['*'], 'page', $page)->appends(request()->query());
        
             return $paginator;
