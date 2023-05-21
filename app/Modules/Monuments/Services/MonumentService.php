@@ -88,7 +88,8 @@ class MonumentService extends Service
         {
             $this->validate($data);
 
-            /*$this->checkIfMonumentAlreadyExists('en', $data['translations']);*/
+            $englishMonument = $this->getEnglishMonumentName($data['monument_language']);
+            $this->checkIfMonumentAlreadyExists('English', $englishMonument);
         
             DB::beginTransaction();
         
@@ -242,16 +243,27 @@ class MonumentService extends Service
             return $monument;
         }
 
+        private function getEnglishMonumentName($monumentLanguages)
+        {
+            foreach ($monumentLanguages as $language) {
+                if ($language['language'] === 'English') {
+                    return $language['name'];
+                }
+            }
+
+            throw new \Exception('Monument name not found for English language.');
+        }
+
         private function checkIfMonumentAlreadyExists($language, $name)
         {
             $monument = $this->_model->whereHas('monumentLanguage', function ($query) use ($language, $name) {
                 $query->where('language', $language)->where('name', $name);
-            })->first();
-
+            })->exists();
+        
             if ($monument) {
                 throw new AlreadyExistsException('Monument already exists.');
             }
-        }
+        }        
 
         private function updateMonumentDimensions($monument, $dimensions)
         {
