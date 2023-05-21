@@ -87,6 +87,10 @@ class MonumentApiController extends Controller
     public function deleteMonument($id){
         try {
             $this->_service->deleteMonument($id);
+
+            return response()->json([
+                'message' => "Monument deleted."
+            ]);
         } catch (NotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage()
@@ -98,6 +102,10 @@ class MonumentApiController extends Controller
     {
         try {
             $this->_service->deleteMultipleMonuments($ids);
+
+            return response()->json([
+                'message' => "Monuments deleted."
+            ]);
         } catch (NotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage()
