@@ -70,8 +70,11 @@ class MonumentApiController extends Controller
     public function updateMonument($id, Request $request){
         try {
             $data = $request->all();
+            
             $monument = $this->_service->updateMonument($id, $data);
-            return $monument;
+            $monument->load('location', 'dimensions', 'images', 'audiovisualSource', 'monumentLanguage', 'images.imageLanguage', 'audiovisualSource.audiovisualSourceLanguage');
+
+            return response()->json($monument);
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => $e->getMessage(),

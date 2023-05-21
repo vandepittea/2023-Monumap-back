@@ -197,11 +197,11 @@ class MonumentService extends Service
                 $this->updateMonumentData($monument, $monumentData); 
 
                 if (isset($data['dimensions'])) {
-                    $dimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    $dimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions']);
                     $this->updateMonumentDimensions($monument, $dimensions);
                 }
                 if (isset($data['audiovisual_source'])) {
-                    $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                    $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source']);
                     $this->updateMonumentAudiovisualSource($monument, $audiovisualSource);
                 }
     
