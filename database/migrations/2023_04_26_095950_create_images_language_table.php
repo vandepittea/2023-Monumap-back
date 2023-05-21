@@ -17,7 +17,8 @@ return new class extends Migration
 
         Schema::create('images_language', function (Blueprint $table) {
             $table->id();
-            $table->integer("image_id");
+            $table->unsignedBigInteger('image_id');
+            $table->foreign('image_id')->references('id')->on('images')->onDelete('cascade');
             $table->string('caption');
             $table->string('language');
             $table->timestamps();

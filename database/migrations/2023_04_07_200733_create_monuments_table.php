@@ -16,7 +16,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
+            $table->unsignedBigInteger('location_id');
+            $table->foreign('location_id')->references('id')->on('locations')->onDelete('cascade');
             $table->string('historical_significance')->nullable();
             $table->enum('type', [
                 'War Memorials',
@@ -53,10 +54,12 @@ return new class extends Migration
             'toegankelijke toiletten'
         );
             $table->json('used_materials')->nullable();
-            $table->foreignId('dimensions_id')->nullable()->constrained('dimensions')->onDelete('cascade');
+            $table->unsignedBigInteger('dimensions_id')->nullable();
+            $table->foreign('dimensions_id')->references('id')->on('dimensions')->onDelete('cascade');
             $table->integer('weight')->nullable();
             $table->decimal('cost_to_construct', 10, 2)->nullable();
-            $table->foreignId('audiovisual_source_id')->nullable()->constrained('audiovisual_sources')->onDelete('cascade');
+            $table->unsignedBigInteger('audiovisual_source_id')->nullable();
+            $table->foreign('audiovisual_source_id')->references('id')->on('audiovisual_sources')->onDelete('cascade');
             $table->enum('language', [
                 'Dutch',
                 'English'

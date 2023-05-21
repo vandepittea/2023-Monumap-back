@@ -17,7 +17,8 @@ return new class extends Migration
 
         Schema::create('monuments_language', function (Blueprint $table) {
             $table->id();
-            $table->integer('monument_id');
+            $table->unsignedBigInteger('monument_id');
+            $table->foreign('monument_id')->references('id')->on('monuments')->onDelete('cascade');
             $table->enum('language', [
                         'Dutch',
                         'English'

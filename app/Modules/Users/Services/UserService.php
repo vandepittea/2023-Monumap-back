@@ -13,12 +13,12 @@ class UserService extends Service
         Parent::__construct($model);
     }  
 
-    protected array $rules = [
+    protected $_rules = [
         'username' => 'required|string|max:100|unique:users',
         'password' => 'required|string|min:6',
     ];
 
-    private array $credentialRules = [
+    private $_credentialRules = [
         'username' => 'required|string',
         'password' => 'required|string',
     ];
@@ -26,12 +26,7 @@ class UserService extends Service
 
     public function registerUser($data)
     {
-        $validator = $this->validate($data);
-    
-        if ($validator->fails()) {
-            //TODO: goede error teruggeven
-            throw new \Exception($validator->errors()->first());
-        }
+        $this->validate($data);
     
         $data['password'] = Hash::make($data['password']);
     
@@ -42,7 +37,7 @@ class UserService extends Service
 
     function login($data) : ?string {
 
-        $validator = Validator::make($data->all(), $this->credentialRules);
+        $validator = Validator::make($data->all(), $this->_credentialRules);
         if ($validator->fails()) return null;
     
         $credentials = $data->only('username', 'password');

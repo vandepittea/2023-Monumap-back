@@ -17,7 +17,8 @@ return new class extends Migration
 
         Schema::create('audiovisual_sources_language', function (Blueprint $table) {
             $table->id();
-            $table->integer("audiovisual_source_id");
+            $table->unsignedBigInteger('audiovisual_source_id');
+            $table->foreign('audiovisual_source_id')->references('id')->on('audiovisual_sources')->onDelete('cascade');
             $table->string('title');
             $table->string('language');
             $table->timestamps();
