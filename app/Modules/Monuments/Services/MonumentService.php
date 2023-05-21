@@ -26,7 +26,10 @@ class MonumentService extends Service
             'weight' => 'nullable|numeric',
             'cost_to_construct' => 'nullable|numeric',
             'images' => 'required',
-            'audiovisual_source' => 'nullable'
+            'images.*.image_language' => 'required|array|min:2',
+            'audiovisual_source' => 'nullable',
+            'audiovisual_source.audiovisual_source_language' => 'nullable|array|min:2',
+            'monument_language' => 'required|array|min:2',
         ];    
 
         private $_locationService;
