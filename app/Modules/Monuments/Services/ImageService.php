@@ -27,7 +27,7 @@ class ImageService extends Service
 
             $image = $monument->images()->create(['url' => $imageData['url']]);
             
-            $this->_imageLanguageService->getOrCreateImageLanguage($imageData['translations'], $image);
+            $this->_imageLanguageService->getOrCreateImageLanguage($imageData['image_language'], $image);
         }
     }  
 

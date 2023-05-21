@@ -88,7 +88,7 @@ class MonumentService extends Service
         {
             $this->validate($data);
 
-            $this->checkIfMonumentAlreadyExists('en', $data['translations']);
+            /*$this->checkIfMonumentAlreadyExists('en', $data['translations']);*/
         
             DB::beginTransaction();
         
@@ -213,7 +213,7 @@ class MonumentService extends Service
                 'used_materials',
                 'weight',
                 'cost_to_construct',
-                'translations'
+                'monument_language'
             ]));
         
             $monumentData['location_id'] = $locationId;
@@ -224,7 +224,7 @@ class MonumentService extends Service
         private function createMonument($monumentData)
         {
             $monument = $this->_model->create($monumentData);
-            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['translations'], $monument);
+            $this->_monumentLanguageService->getOrCreateMonumentLanguage($monumentData['monument_language'], $monument);
             return $monument;
         }        
         

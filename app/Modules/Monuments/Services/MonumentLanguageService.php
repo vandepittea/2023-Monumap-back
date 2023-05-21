@@ -20,21 +20,20 @@ class MonumentLanguageService extends ServiceLanguages
     {
         $this->validate($monumentLanguageData);
 
-        foreach ($monumentLanguageData as $language => $data) {    
+        foreach ($monumentLanguageData as $data) {
+            $language = $data['language'];
+
             $monumentLanguageDataResult = [
                 'historical_significance' => $data['historical_significance'] ?? null,
                 'name' => $data['name'],
                 'description' => $data['description'],
                 'type' => $data['type'],
-                'language' => $data['language'],
                 'accessibility' => $data['accessibility'] ?? null,
                 'used_materials' => $data['used_materials'] ?? null
             ];
-    
-            $monument->monumentLanguage()->updateOrCreate(
-                ['language' => $language],
-                $monumentLanguageDataResult
-            );
+
+            $monument->monumentLanguage()
+                ->updateOrCreate(['language' => $language], $monumentLanguageDataResult);
         }
-    }    
+    }  
 }

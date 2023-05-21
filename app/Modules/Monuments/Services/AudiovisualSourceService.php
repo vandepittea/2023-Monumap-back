@@ -32,7 +32,7 @@ class AudioVisualSourceService extends Service
 
         $audiovisualSource = $monument->audiovisualSource()->create($audiovisualSourceResult);
 
-        $this->_audioVisualSourceLanguageService->getOrCreateAudiovisualSourceLanguage($audiovisualSourceData['translations'], $audiovisualSource);
+        $this->_audioVisualSourceLanguageService->getOrCreateAudiovisualSourceLanguage($audiovisualSourceData['audiovisual_source_language'], $audiovisualSource);
 
         return $audiovisualSource;
     }
