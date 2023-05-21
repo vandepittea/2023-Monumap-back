@@ -22,4 +22,9 @@ class Service {
             throw new ValidationException($validator);
         }
     }
+
+    public function deleteUnusedObjects()
+    {
+        $this->_model->doesntHave('monuments')->delete();
+    }
 }

@@ -21,7 +21,7 @@ class AudioVisualSourceService extends Service
         $this->_audioVisualSourceLanguageService = $audioVisualSourceLanguageService;
     }
 
-    public function getOrCreateAudiovisualSource($audiovisualSourceData, $monument)
+    public function getOrCreateAudiovisualSource($audiovisualSourceData)
     {
         $this->validate($audiovisualSourceData);
 
@@ -30,7 +30,7 @@ class AudioVisualSourceService extends Service
             'type' => $audiovisualSourceData['type']
         ]);
 
-        $audiovisualSource = $monument->audiovisualSource()->create($audiovisualSourceResult);
+        $audiovisualSource = $this->_model->firstOrCreate($audiovisualSourceResult);
 
         $this->_audioVisualSourceLanguageService->getOrCreateAudiovisualSourceLanguage($audiovisualSourceData['audiovisual_source_language'], $audiovisualSource);
 
@@ -39,6 +39,6 @@ class AudioVisualSourceService extends Service
 
     public function deleteUnusedAudiovisualSources()
     {
-        $this->_model->doesntHave('monuments');
+        $this->_model->doesntHave('monuments')->delete();
     }
 }

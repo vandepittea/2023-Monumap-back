@@ -33,9 +33,5 @@ class LocationService extends Service
             );
             
             return $location;
-        }
-        
-        public function deleteUnusedLocations() {
-            $this->_model->doesntHave('monuments')->delete();
-        }          
+        }       
 }

@@ -118,11 +118,11 @@ class MonumentService extends Service
                 $monument = $this->createMonument($monumentData);
         
                 if (isset($data['dimensions'])) {
-                    $dimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions'], $monument);
+                    $dimensions = $this->_dimensionService->getOrCreateDimensions($data['dimensions']);
                     $this->updateMonumentDimensions($monument, $dimensions);
                 }
                 if (isset($data['audiovisual_source'])) {
-                    $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source'], $monument);
+                    $audiovisualSource = $this->_audiovisualSourceService->getOrCreateAudiovisualSource($data['audiovisual_source']);
                     $this->updateMonumentAudiovisualSource($monument, $audiovisualSource);
                 }
                 
@@ -210,9 +210,9 @@ class MonumentService extends Service
                 $this->_imageService->deleteImages($id);
                 $this->_imageService->createImages($data['images']['urls'], $data['images']['captions']['en'], $data['images']['captions']['nl'], $monument);
 
-                $this->_locationService->deleteUnusedLocations($oldLocationId);
-                $this->_dimensionService->deleteUnusedDimensions($oldDimensionsId);
-                $this->_audiovisualSourceService->deleteUnusedAudiovisualSources($oldAudiovisualSourceId);
+                $this->_locationService->deleteUnusedObjects();
+                $this->_dimensionService->deleteUnusedObjects();
+                $this->_audiovisualSourceService->deleteUnusedObjects();
     
                 DB::commit();
 
@@ -230,9 +230,9 @@ class MonumentService extends Service
                 $monument->delete();
             }
 
-            $this->_locationService->deleteUnusedLocations();
-            $this->_dimensionService->deleteUnusedDimensions();
-            $this->_audiovisualSourceService->deleteUnusedAudiovisualSources();
+            $this->_locationService->deleteUnusedObjects();
+            $this->_dimensionService->deleteUnusedObjects();
+            $this->_audiovisualSourceService->deleteUnusedObjects();
         }
 
         public function deleteMultipleMonuments($ids) {
@@ -244,9 +244,9 @@ class MonumentService extends Service
         
             $this->_model->destroy($ids);
 
-            $this->_locationService->deleteUnusedLocations();
-            $this->_dimensionService->deleteUnusedDimensions();
-            $this->_audiovisualSourceService->deleteUnusedAudiovisualSources();
+            $this->_locationService->deleteUnusedObjects();
+            $this->_dimensionService->deleteUnusedObjects();
+            $this->_audiovisualSourceService->deleteUnusedObjects();
         }                          
         
         private function getMonumentData($data, $locationId)

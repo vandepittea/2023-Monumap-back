@@ -17,7 +17,7 @@ class DimensionService extends Service
             Parent::__construct($model);
         }   
 
-        public function getOrCreateDimensions($dimensionsData, $monument)
+        public function getOrCreateDimensions($dimensionsData)
         {
             $this->validate($dimensionsData);
         
@@ -27,7 +27,7 @@ class DimensionService extends Service
                 'depth' => $dimensionsData['depth']
             ];
         
-            $dimensions = $monument->dimensions()->firstOrCreate($dimensionData);
+            $dimensions = $this->_model->firstOrCreate($dimensionData);
 
             return $dimensions;
         }        
