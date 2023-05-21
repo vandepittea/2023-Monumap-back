@@ -31,8 +31,4 @@ class DimensionService extends Service
 
             return $dimensions;
         }        
-        
-        public function deleteUnusedDimensions() {
-            $this->_model->doesntHave('monuments')->delete();
-        }
 }
